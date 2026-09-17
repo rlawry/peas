@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mendel's Garden, Pea Plant Cross</title>
+<title>The Hidden White - A Pea Plant Mystery</title>
 <style>
   :root{
     --night:#132019;
@@ -17,531 +17,412 @@
     --violet-deep:#6f45ad;
     --leaf:#68a95a;
     --wheat:#e8dcae;
-    --soil:#6d4c33;
-    --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-    --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
-  body{
-    background:var(--night);
-    color:var(--pale);
-    font-family:var(--serif);
-    font-size:15px;
-    line-height:1.45;
-    -webkit-font-smoothing:antialiased;
-    overflow:hidden;
-  }
+  body{background:var(--night);color:var(--pale);font-family:var(--serif);
+    font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;overflow:hidden}
   button{font-family:inherit;color:inherit;cursor:pointer;
     touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   button:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
 
-  #app{
-    display:grid;
-    grid-template-columns:clamp(264px,25vw,344px) 1fr;
-    height:100%;
-  }
+  #app{display:grid;grid-template-columns:clamp(296px,28vw,386px) 1fr;height:100%}
 
-  /* ---------- left: the two beds ---------- */
-  #beds{
-    display:flex;
-    flex-direction:column;
-    background:var(--bed);
-    border-right:1px solid var(--edge-soft);
-    min-height:0;
-  }
-  .bed{
-    flex:1 1 0;
-    display:flex;
-    flex-direction:column;
-    min-height:0;
-    padding:10px 14px 12px;
-    overflow:auto;
-  }
-  .bed-head{
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:8px;
-    margin-bottom:6px;
-  }
-  .bed-head h2{
-    font-size:16px;
-    font-weight:600;
-    margin:0;
-    letter-spacing:.01em;
-  }
-  .bed-head .pheno{
-    font-size:12.5px;
-    color:var(--dim);
-    text-align:right;
-    font-style:italic;
-  }
-  .plant-frame{
-    flex:1 1 150px;
-    min-height:94px;
-    border:1px solid var(--edge-soft);
-    border-radius:3px;
-    background:#101b15;
-    overflow:hidden;
-  }
+  #beds{display:flex;flex-direction:column;background:var(--bed);
+    border-right:1px solid var(--edge-soft);min-height:0}
+  .bed{flex:1 1 0;display:flex;flex-direction:column;min-height:0;
+    padding:10px 14px 12px;overflow:auto}
+  .bed-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
+  .bed-head h2{font-size:15px;font-weight:600;margin:0}
+  .bed-head .tag{font-size:11.5px;color:var(--dim);font-style:italic}
+  .plant-frame{flex:1 1 128px;min-height:74px;border:1px solid var(--edge-soft);
+    border-radius:3px;background:#101b15;overflow:hidden}
   .plant-frame canvas{display:block;width:100%;height:100%}
 
-  .src{margin-top:9px}
-  .src .seg{width:100%}
-  .src .seg button{flex:1;font-family:var(--serif);font-size:11.5px;padding:3px 4px}
-  .seg button[disabled]{opacity:.35;cursor:default}
-  .seg button[disabled]:hover{background:transparent;color:var(--dim)}
-  .traits{margin-top:9px;display:flex;flex-direction:column;gap:5px}
-  .trait{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px}
-  .trait .seg{width:100%}
-  .seg button{flex:1}
-  .trait-name{font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .trait-name b{color:var(--pale);font-weight:500}
-  .abbr{display:none}
-  .seg{display:flex;border:1px solid var(--edge-soft);border-radius:3px;overflow:hidden}
-  .seg button{
-    background:transparent;border:0;
-    font-family:var(--mono);
-    font-size:12px;
-    padding:4px 9px;
-    color:var(--dim);
-    border-right:1px solid var(--edge-soft);
-    transition:background .12s,color .12s;
+  /* the two mystery plants, both on screen, each its own target */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:9px;flex:1 1 auto;min-height:0}
+  .pcard{
+    display:flex;flex-direction:column;gap:5px;position:relative;min-height:0;
+    background:var(--bed-2);border:2px solid var(--edge-soft);border-radius:4px;
+    padding:7px 7px 6px;text-align:center;
+    transition:border-color .14s,background .14s,box-shadow .14s;
   }
-  .seg button:last-child{border-right:0}
-  .seg button:hover{background:var(--bed-2);color:var(--pale)}
-  .seg button[aria-pressed="true"]{background:var(--violet-deep);color:#fff}
+  .pcard:hover{border-color:var(--edge);background:#25382c}
+  .pcard[aria-pressed="true"]{
+    border-color:var(--violet);background:#2d2242;
+    box-shadow:0 0 0 1px var(--violet) inset,0 0 16px rgba(162,116,224,.28);
+  }
+  .pname{font-size:12px;line-height:1.2;font-weight:500;color:var(--dim);
+    min-height:2.4em;display:flex;align-items:center;justify-content:center}
+  .pcard[aria-pressed="true"] .pname{color:#fff}
+  .pframe{flex:1 1 auto;min-height:54px;display:block;overflow:hidden;
+    border:1px solid var(--edge-soft);border-radius:3px;background:#0e1712}
+  .pframe canvas{display:block;width:100%;height:100%}
+  .ptally{font-family:var(--mono);font-size:10px;color:var(--dim)}
+  .pcard[aria-pressed="true"] .ptally{color:#cdb9f0}
+  .pbadge{
+    position:absolute;top:-2px;right:-2px;display:none;
+    background:var(--violet);color:#1b1327;border-radius:0 3px 0 5px;
+    font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px}
+  .pcard[aria-pressed="true"] .pbadge{display:block}
+  .xhint{display:block;font-size:11.5px;color:var(--dim);margin-bottom:6px;text-align:center}
 
-  /* ---------- the cross bar ---------- */
-  #crossbar{
-    flex:0 0 auto;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:9px 14px;
-    background:var(--bed-2);
-    border-top:1px solid var(--edge-soft);
-    border-bottom:1px solid var(--edge-soft);
-  }
-  #crossbar .glyph{
-    font-size:19px;color:var(--dim);font-family:var(--mono);
-  }
-  #reproduce{
-    flex:1;
-    background:var(--violet-deep);
-    border:1px solid var(--violet);
-    border-radius:3px;
-    color:#fff;
-    font-size:15px;
-    letter-spacing:.02em;
-    padding:9px 12px;
-    transition:background .14s,transform .08s;
-  }
-  #reproduce:hover{background:#7d50c0}
-  #reproduce:active{transform:translateY(1px)}
-  #reproduce[disabled]{opacity:.45;cursor:default;transform:none}
+  .note{margin:8px 0 0;font-size:11.5px;color:var(--dim);line-height:1.4}
 
-  /* ---------- right: the field ---------- */
+  #crossbar{flex:0 0 auto;padding:9px 14px;background:var(--bed-2);
+    border-top:1px solid var(--edge-soft);border-bottom:1px solid var(--edge-soft)}
+  #sow{
+    position:relative;width:100%;overflow:hidden;
+    background:var(--violet-deep);border:1px solid var(--violet);border-radius:3px;
+    color:#fff;font-size:15px;padding:9px 12px;transition:background .14s}
+  #sow:hover:not([disabled]){background:#7d50c0}
+  #sow[disabled]{cursor:default;background:#2b3b31;border-color:var(--edge-soft);color:var(--dim)}
+  #sow .fill{position:absolute;left:0;top:0;bottom:0;background:rgba(162,116,224,.28);
+    width:0;transition:width .2s linear}
+  #sow .txt{position:relative}
+
+  /* the decision sits at the foot of the rail, under sowing, in its own
+     colour so it is never mistaken for the sow button */
+  #decidebar{flex:0 0 auto;padding:10px 14px;background:var(--bed-2);
+    border-top:1px solid var(--edge-soft)}
+  #call{width:100%;background:#b8892f;border:1px solid #e3b155;border-radius:3px;
+    color:#1d1405;font-size:15px;font-weight:600;padding:11px 12px;
+    transition:background .14s}
+  #call:hover{background:#cf9c38}
+  #call:active{transform:translateY(1px)}
+  #call.ready{animation:nudge 2.6s ease-in-out infinite}
+  @keyframes nudge{
+    0%,100%{box-shadow:0 0 0 0 rgba(227,177,85,0)}
+    50%{box-shadow:0 0 0 7px rgba(227,177,85,.20)}
+  }
+  @media (prefers-reduced-motion:reduce){#call.ready{animation:none}}
+
   #stage{position:relative;min-width:0;display:flex;flex-direction:column}
-  #tools{
-    display:flex;align-items:center;gap:8px;
-    padding:8px 14px;
-    border-bottom:1px solid var(--edge-soft);
-    background:var(--bed);
-    flex-wrap:wrap;
-  }
-  #tools h1{
-    font-size:15px;font-weight:600;margin:0 auto 0 0;letter-spacing:.01em;
-  }
-  #tools h1 span{color:var(--dim);font-weight:400;font-style:italic}
-  .tool{
-    background:transparent;
-    border:1px solid var(--edge-soft);
-    border-radius:3px;
-    font-size:12.5px;
-    padding:4px 10px;
-    color:var(--dim);
-    transition:border-color .12s,color .12s;
-  }
+  #tools{display:flex;align-items:center;gap:10px;padding:8px 14px;flex-wrap:wrap;
+    border-bottom:1px solid var(--edge-soft);background:var(--bed)}
+  #tools h1{font-size:15px;font-weight:600;margin:0 auto 0 0}
+  .stat{font-size:12.5px;color:var(--dim)}
+  .stat b{color:var(--wheat);font-family:var(--mono);font-size:12px}
+  .tool{background:transparent;border:1px solid var(--edge-soft);border-radius:3px;
+    font-size:12.5px;padding:4px 10px;color:var(--dim);transition:border-color .12s,color .12s}
   .tool:hover{border-color:var(--edge);color:var(--pale)}
+  .tool.go{border-color:var(--violet);color:var(--pale)}
+  .tool.go:hover{background:var(--violet-deep)}
+
   #field-wrap{position:relative;flex:1;min-height:0}
   #field{display:block;width:100%;height:100%}
 
-  #readout{
-    position:absolute;top:12px;right:12px;width:262px;
-    background:rgba(16,27,21,.93);
-    border:1px solid var(--edge-soft);
-    border-radius:3px;
-    padding:10px 12px 11px;
-    backdrop-filter:blur(3px);
-  }
-  #readout h3{margin:0 0 2px;font-size:14px;font-weight:600}
-  #readout .sub{font-size:12px;color:var(--dim);font-style:italic;margin-bottom:8px}
-  .res{display:grid;grid-template-columns:auto 1fr;gap:3px 9px;align-items:baseline;font-size:12.5px}
-  .res .g{font-family:var(--mono);font-size:12.5px;color:var(--wheat)}
-  .res .p{color:var(--pale)}
-  .res .p em{color:var(--dim);font-size:11.5px;font-style:normal}
-  .empty{font-size:12.5px;color:var(--dim);line-height:1.5}
-
-  .lot{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:400;letter-spacing:0}
-  #transplant{
-    display:none;
-    position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
-    align-items:center;gap:8px;
-    background:rgba(16,27,21,.94);
-    border:1px solid var(--edge);
-    border-radius:3px;padding:7px 10px;
-    white-space:nowrap;
-  }
-  .tp-label{font-size:12.5px;color:var(--dim)}
-  .tp-btn{
-    background:transparent;border:1px solid var(--edge);border-radius:3px;
-    font-size:12.5px;padding:4px 10px;color:var(--pale);
-    transition:background .12s,border-color .12s;
-  }
-  .tp-btn:hover{background:var(--violet-deep);border-color:var(--violet)}
-  #answerkey{
-    display:none;
-    position:absolute;right:12px;bottom:12px;width:238px;
-    background:rgba(40,28,16,.94);
-    border:1px solid #6b5426;
-    border-radius:3px;padding:9px 12px 10px;
-  }
-  #answerkey h3{margin:0 0 6px;font-size:13px;font-weight:600;color:#f0dfa8}
-  #answerkey h3 span{float:right;font-family:var(--mono);font-size:10.5px;color:#a8925f;font-weight:400}
-  #ledger{
-    position:absolute;left:12px;bottom:12px;
-    background:rgba(16,27,21,.93);
-    border:1px solid var(--edge-soft);
-    border-radius:3px;
-    padding:9px 12px 10px;
-    min-width:212px;
-  }
+  #ledger{position:absolute;left:12px;bottom:12px;background:rgba(16,27,21,.93);
+    border:1px solid var(--edge-soft);border-radius:3px;padding:9px 12px 10px;min-width:216px}
   #ledger h3{margin:0 0 6px;font-size:13px;font-weight:600}
-  #ledger h3 span{color:var(--dim);font-weight:400}
-  .row{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:12px;margin-bottom:5px}
-  .bar{height:5px;border-radius:3px;background:var(--edge-soft);overflow:hidden;margin-top:2px}
-  .bar i{display:block;height:100%;background:var(--violet);transition:width .3s}
-  .row .lbl{color:var(--dim)}
-  .row .lbl b{color:var(--pale);font-weight:500}
-  .row .num{font-family:var(--mono);font-size:11.5px;color:var(--wheat)}
+  .lrow{display:grid;grid-template-columns:1fr auto;gap:10px;font-size:12px;margin-bottom:4px}
+  .lrow .nm{color:var(--dim)}
+  .lrow .nm b{color:var(--pale);font-weight:500}
+  .lrow .ct{font-family:var(--mono);font-size:11px;color:var(--wheat);white-space:nowrap}
+  .lrow.on .nm b{color:var(--violet)}
+  .lnote{font-size:10.5px;color:var(--dim);font-style:italic;margin-top:5px}
 
-  /* Chromebook tier - 1366x768 leaves roughly 620px of viewport */
-  @media (max-height:780px), (max-width:1180px){
+  #overlay{position:fixed;inset:0;background:rgba(9,16,12,.93);z-index:40;
+    display:none;align-items:center;justify-content:center;padding:20px;overflow:auto}
+  #overlay.show{display:flex}
+  .card{width:min(560px,100%);background:var(--bed);border:1px solid var(--edge);
+    border-radius:5px;padding:20px 22px 18px}
+  .card h2{margin:0 0 4px;font-size:21px;font-weight:600}
+  .card .lead{margin:0 0 14px;color:var(--dim);font-size:13.5px}
+  .choice{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  .choice button{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;
+    background:transparent;border:1px solid var(--edge-soft);border-radius:3px;
+    padding:10px 12px;font-size:14px;color:var(--pale);transition:border-color .12s,background .12s}
+  .choice button:hover{border-color:var(--edge)}
+  .choice button[aria-pressed="true"]{background:var(--violet-deep);border-color:var(--violet)}
+  .choice .mark{font-family:var(--mono);font-size:12px;color:var(--dim);white-space:nowrap}
+  .choice button[aria-pressed="true"] .mark{color:#e6d9ff}
+  .card .hint{font-size:12px;color:var(--dim);margin:0 0 14px;font-style:italic}
+  .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{background:var(--violet-deep);border:1px solid var(--violet);border-radius:3px;
+    color:#fff;font-size:14.5px;padding:9px 18px}
+  .btn:hover{background:#7d50c0}
+  .btn.ghost{background:transparent;border-color:var(--edge-soft);color:var(--dim)}
+  .btn.ghost:hover{color:var(--pale);border-color:var(--edge)}
+  /* the result reads as right or wrong before a word is read */
+  #overlay.right{background:rgba(9,28,15,.94)}
+  #overlay.wrong{background:rgba(30,11,8,.94)}
+  .card.right{
+    border-color:#4cc26a;
+    background:linear-gradient(180deg,#1d3a27 0%,var(--bed) 58%);
+    box-shadow:0 0 0 1px rgba(76,194,106,.45),0 0 44px rgba(76,194,106,.20);
+  }
+  .card.wrong{
+    border-color:#d3624f;
+    background:linear-gradient(180deg,#3b2320 0%,var(--bed) 58%);
+    box-shadow:0 0 0 1px rgba(211,98,79,.45),0 0 44px rgba(211,98,79,.18);
+  }
+  .card.right h2{color:#95f2ab}
+  .card.wrong h2{color:#ffb0a0}
+  .banner{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+  .banner h2{margin:0}
+  .banner .lead{margin:2px 0 0}
+  .glyph{flex:0 0 auto;width:46px;height:46px;border-radius:50%;position:relative}
+  .right .glyph{background:#3fa858;box-shadow:0 0 0 5px rgba(63,168,88,.20)}
+  .wrong .glyph{background:#c8503f;box-shadow:0 0 0 5px rgba(200,80,63,.20)}
+  .right .glyph::before{content:"";position:absolute;left:15px;top:9px;
+    width:11px;height:21px;border-right:4px solid #fff;border-bottom:4px solid #fff;
+    transform:rotate(43deg);border-radius:2px}
+  .wrong .glyph::before,.wrong .glyph::after{content:"";position:absolute;
+    left:21px;top:12px;width:4px;height:22px;background:#fff;border-radius:2px}
+  .wrong .glyph::before{transform:rotate(45deg)}
+  .wrong .glyph::after{transform:rotate(-45deg)}
+  .card.right .pip.on{background:#4cc26a}
+  .card.right .btn{background:#2f8a49;border-color:#4cc26a}
+  .card.right .btn:hover{background:#3aa257}
+  .card.wrong .btn{background:#a8412f;border-color:#d3624f}
+  .card.wrong .btn:hover{background:#c04c38}
+  .verdict{display:flex;flex-direction:column;gap:9px;margin-bottom:15px}
+  .vrow{border-left:2px solid var(--edge);padding:2px 0 2px 11px;font-size:13.5px}
+  .vrow.yes{border-left-color:var(--violet)}
+  .vrow.no{border-left-color:#6c7f70}
+  .vrow b{font-weight:600}
+  .vrow span{display:block;color:var(--dim);font-size:12.5px;margin-top:1px}
+  .pips{display:flex;gap:5px;margin:0 0 14px}
+  .pip{width:20px;height:6px;border-radius:3px;background:var(--edge-soft)}
+  .pip.on{background:var(--violet)}
+  #awardCanvas{display:block;width:100%;height:150px;border:1px solid var(--edge-soft);
+    border-radius:3px;background:#101b15;margin-bottom:14px}
+  .code{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    background:#101b15;border:1px solid var(--edge);border-radius:4px;
+    padding:10px 14px;margin-bottom:8px}
+  .codeLabel{font-size:11px;color:var(--dim);letter-spacing:.09em;text-transform:uppercase}
+  .codeVal{flex:1;font-family:var(--mono);font-size:27px;letter-spacing:.2em;
+    color:var(--wheat);user-select:all;-webkit-user-select:all}
+  .codeNote{font-size:11.5px;color:var(--dim);font-style:italic;margin:0 0 14px}
+  .medal{font-size:13.5px;color:var(--dim);margin:0 0 14px}
+  .medal b{color:var(--wheat)}
+
+  @media (max-height:780px),(max-width:1180px){
     body{font-size:14px}
-    .full{display:none}
-    .abbr{display:inline}
     .bed{padding:7px 10px 8px}
-    .bed-head{margin-bottom:4px}
     .bed-head h2{font-size:13.5px}
-    .bed-head .pheno{font-size:10.5px;line-height:1.3}
-    .lot{font-size:10px}
-    .plant-frame{flex:1 1 96px;min-height:60px}
-    .src{margin-top:6px}
-    .src .seg button{font-size:10.5px;padding:4px 2px}
-    .traits{margin-top:6px;gap:3px}
-    .trait{gap:6px}
-    .trait-name{font-size:11.5px}
-    .seg button{font-size:11.5px;padding:4px 6px}
-    #crossbar{padding:6px 10px;gap:8px}
-    #crossbar .glyph{font-size:16px}
-    #reproduce{font-size:14px;padding:7px 10px}
-    #tools{padding:5px 10px;gap:6px}
+    .plant-frame{flex:1 1 92px;min-height:58px}
+    .cards{gap:7px}
+    .pcard{padding:5px 5px 4px;gap:4px}
+    .pname{font-size:11px;min-height:2.3em}
+    .pframe{min-height:46px}
+    .xhint{font-size:10.5px;margin-bottom:4px}
+    .note{font-size:10.5px}
+    #crossbar{padding:6px 10px}
+    #decidebar{padding:7px 10px}
+    #call{font-size:14px;padding:9px 10px}
+    #sow{font-size:14px;padding:7px 10px}
+    #tools{padding:5px 10px;gap:8px}
     #tools h1{font-size:13px}
-    #tools h1 span{display:none}
-    .tool{font-size:11.5px;padding:4px 8px}
-    #readout{width:214px;top:8px;right:8px;padding:8px 10px 9px}
-    #readout h3{font-size:13px}
-    #readout .sub{font-size:11px;margin-bottom:6px}
-    .res{font-size:11.5px;gap:2px 7px}
-    .res .g,.res .p em{font-size:11px}
-    .empty{font-size:11.5px}
-    #ledger{left:8px;bottom:8px;min-width:180px;padding:7px 10px 8px}
-    #ledger h3{font-size:12px;margin-bottom:5px}
-    .row{font-size:11px;margin-bottom:4px}
-    .bar{height:4px}
-    #transplant{
-    display:none;
-    position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
-    align-items:center;gap:8px;
-    background:rgba(16,27,21,.94);
-    border:1px solid var(--edge);
-    border-radius:3px;padding:7px 10px;
-    white-space:nowrap;
+    .stat,.tool{font-size:11.5px}
+    #ledger{left:8px;bottom:8px;min-width:196px;padding:7px 10px 8px}
+    .card{padding:16px 18px 15px}
+    .card h2{font-size:19px}
   }
-  .tp-label{font-size:12.5px;color:var(--dim)}
-  .tp-btn{
-    background:transparent;border:1px solid var(--edge);border-radius:3px;
-    font-size:12.5px;padding:4px 10px;color:var(--pale);
-    transition:background .12s,border-color .12s;
-  }
-  .tp-btn:hover{background:var(--violet-deep);border-color:var(--violet)}
-  #answerkey{right:8px;bottom:8px;width:200px;padding:8px 10px}
-  }
-  /* smallest Chromebooks and heavy browser chrome */
   @media (max-height:640px){
-    .plant-frame{flex:1 1 68px;min-height:46px}
+    .plant-frame{flex:1 1 60px;min-height:44px}
+    .pname{min-height:0;font-size:10.5px}
+    .pframe{min-height:40px}
     .bed{padding:6px 9px 7px}
-    .traits{gap:2px}
-    .seg button{padding:3px 6px}
-    #reproduce{padding:6px 10px}
   }
   @media (max-width:820px){
     body{overflow:auto}
     #app{grid-template-columns:1fr;height:auto}
     #beds{border-right:0;border-bottom:1px solid var(--edge-soft)}
-    .bed{flex:none}
-    .plant-frame{flex-basis:auto;height:130px}
     #field-wrap{height:auto}
     #field{height:52vh}
-    #readout{position:static;width:auto;margin:12px}
-    .lot{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:400;letter-spacing:0}
-  #transplant{
-    display:none;
-    position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
-    align-items:center;gap:8px;
-    background:rgba(16,27,21,.94);
-    border:1px solid var(--edge);
-    border-radius:3px;padding:7px 10px;
-    white-space:nowrap;
-  }
-  .tp-label{font-size:12.5px;color:var(--dim)}
-  .tp-btn{
-    background:transparent;border:1px solid var(--edge);border-radius:3px;
-    font-size:12.5px;padding:4px 10px;color:var(--pale);
-    transition:background .12s,border-color .12s;
-  }
-  .tp-btn:hover{background:var(--violet-deep);border-color:var(--violet)}
-  #answerkey{
-    display:none;
-    position:absolute;right:12px;bottom:12px;width:238px;
-    background:rgba(40,28,16,.94);
-    border:1px solid #6b5426;
-    border-radius:3px;padding:9px 12px 10px;
-  }
-  #answerkey h3{margin:0 0 6px;font-size:13px;font-weight:600;color:#f0dfa8}
-  #answerkey h3 span{float:right;font-family:var(--mono);font-size:10.5px;color:#a8925f;font-weight:400}
-  #ledger{position:static;margin:0 12px 12px}
-  }
-  @media (prefers-reduced-motion:reduce){
-    #reproduce,.tool,.seg button{transition:none}
+    #ledger{position:static;margin:0 12px 12px}
   }
 </style>
 </head>
 <body>
 <div id="app">
-
   <aside id="beds">
-    <section class="bed" id="bed1">
+    <section class="bed" id="bedTop">
       <div class="bed-head">
-        <h2>Parent 1 <span class="lot" id="lot1"></span></h2>
-        <div class="pheno" id="pheno1"></div>
+        <h2>The two mystery plants</h2>
+        <div class="tag">both violet</div>
       </div>
-      <div class="plant-frame"><canvas id="cv1"></canvas></div>
-      <div class="src" id="src1"></div>
-      <div class="traits" id="traits1"></div>
+      <div class="cards" id="cards">
+        <button class="pcard" type="button" data-i="0" aria-pressed="true">
+          <span class="pbadge">Testing</span>
+          <span class="pname" id="nm0"></span>
+          <span class="pframe"><canvas id="cv0"></canvas></span>
+          <span class="ptally" id="ty0"></span>
+        </button>
+        <button class="pcard" type="button" data-i="1" aria-pressed="false">
+          <span class="pbadge">Testing</span>
+          <span class="pname" id="nm1"></span>
+          <span class="pframe"><canvas id="cv1"></canvas></span>
+          <span class="ptally" id="ty1"></span>
+        </button>
+      </div>
     </section>
 
     <div id="crossbar">
-      <span class="glyph">&times;</span>
-      <button id="reproduce">Reproduce</button>
+      <span class="xhint">the highlighted plant is crossed with the tester below</span>
+      <button id="sow"><span class="fill" id="sowFill"></span><span class="txt" id="sowTxt">Sow 10 seeds</span></button>
     </div>
 
-    <section class="bed" id="bed2">
+    <section class="bed">
       <div class="bed-head">
-        <h2>Parent 2 <span class="lot" id="lot2"></span></h2>
-        <div class="pheno" id="pheno2"></div>
+        <h2>The tester</h2>
+        <div class="tag">white flowers</div>
       </div>
-      <div class="plant-frame"><canvas id="cv2"></canvas></div>
-      <div class="src" id="src2"></div>
-      <div class="traits" id="traits2"></div>
+      <div class="plant-frame"><canvas id="cvT"></canvas></div>
+      <p class="note">This plant's flowers are white, so white is the only
+        flower colour it can pass on. Anything violet in a seedling had to
+        come from the mystery plant.</p>
     </section>
+
+    <div id="decidebar">
+      <button id="call">I am ready to make my decision!</button>
+    </div>
   </aside>
 
   <main id="stage">
     <div id="tools">
-      <h1>Mendel's Garden</h1>
-      <button class="tool" id="draw" title="Fresh plants from the seed stock - same looks, different makeup">Draw new plants</button>
-      <button class="tool" id="skip">Finish growing</button>
-      <button class="tool" id="fast">Cross 50 more</button>
-      <button class="tool" id="reset">Clear the count</button>
+      <h1>The Hidden White</h1>
+      <span class="stat">Solved <b id="statSolved">0/6</b></span>
+      <span class="stat">Seeds left <b id="statSeeds">200</b></span>
     </div>
     <div id="field-wrap">
       <canvas id="field"></canvas>
-      <div id="readout"></div>
       <div id="ledger"></div>
-      <div id="transplant">
-        <span class="tp-label"></span>
-        <button class="tp-btn" id="tp1">Parent 1</button>
-        <button class="tp-btn" id="tp2">Parent 2</button>
-      </div>
-      <div id="answerkey"></div>
     </div>
   </main>
-
 </div>
+
+<div id="overlay"><div class="card" id="card"></div></div>
 
 <script>
 (function(){
 "use strict";
 
 /* ============================================================
-   GENETICS
-   Four of Mendel's seven characters. Alleles: 1 = dominant, 0 = recessive.
+   TUNING - the three numbers most worth changing
    ============================================================ */
-var TRAITS = [
-  {key:'shape', L:'R', name:'Seed shape',     dom:'Round',  rec:'Wrinkled', abbr:'Seed'},
-  {key:'stem',  L:'T', name:'Stem length',    dom:'Tall',   rec:'Short',    abbr:'Stem'},
-  {key:'color', L:'V', name:'Flower color',   dom:'Violet', rec:'White',    abbr:'Color'},
-  {key:'pos',   L:'A', name:'Flower position',dom:'Axial',  rec:'Terminal',
-   domLabel:'Along stem', recLabel:'At top', abbr:'Position'}
-];
-function label(tr, dominant){
-  return dominant ? (tr.domLabel || tr.dom) : (tr.recLabel || tr.rec);
-}
-var POS_NOTE = {Axial:'along the stem', Terminal:'at the top'};
+var SOW_SIZE    = 10;        // seeds per sowing
+var COOLDOWN_MS = 12000;     // wait between sowings
+var SEED_CAP    = 200;       // seeds per round before a call is forced
+var TO_WIN      = 6;         // correct rounds needed for the award
 
-function geno(tr, a){                    // [1,1] -> "RR"
-  var s = a.slice().sort(function(x,y){return y-x;});
-  return s.map(function(v){return v ? tr.L : tr.L.toLowerCase();}).join('');
-}
-function isDom(a){ return a[0]===1 || a[1]===1; }
-function phen(tr, a){ return isDom(a) ? tr.dom : tr.rec; }
-
-function crossOne(a, b){                 // one allele from each parent, at random
-  return [ a[Math.random()<0.5?0:1], b[Math.random()<0.5?0:1] ];
-}
-function crossAll(p1, p2){
-  var kid = {};
-  TRAITS.forEach(function(tr){ kid[tr.key] = crossOne(p1[tr.key], p2[tr.key]); });
-  return kid;
-}
-function expectedRatio(a, b){            // "3 : 1", "1 : 1", "all dominant"...
-  var d=0, r=0;
-  for(var i=0;i<2;i++) for(var j=0;j<2;j++){ (a[i]||b[j]) ? d++ : r++; }
-  if(r===0) return 'every seed dominant';
-  if(d===0) return 'every seed recessive';
-  var g = gcd(d,r);
-  return (d/g)+' : '+(r/g);
-}
-function gcd(a,b){ return b ? gcd(b, a%b) : a; }
-
-/* ============================================================
-   STATE
-   ============================================================ */
-var state = {
-  p1: {shape:[1,1], stem:[1,1], color:[1,1], pos:[1,1]},
-  p2: {shape:[0,0], stem:[0,0], color:[0,0], pos:[0,0]},
-  child: null,
-  t0: 0,
-  playing: false,
-  finished: true,
-  tally: {}, total: 0,
-  rain: [],
-  bank: {p1:{}, p2:{}},     // hidden genotype for each parent's dominant traits
-  want: {p1:{}, p2:{}},     // the phenotype the student picked
-  lot:  {p1:'', p2:''},
-  src:  {p1:'true', p2:'true'},   // 'true' | 'unmarked' | 'field'
-  adopted: {p1:null, p2:null},    // a seedling transplanted into the bed
-  gen:  {p1:1, p2:1},
-  childGen: 2,
-  key: false                // teacher's answer key, off
-};
-TRAITS.forEach(function(tr){
-  state.bank.p1[tr.key] = {}; state.bank.p2[tr.key] = {};
-  state.want.p1[tr.key] = true; state.want.p2[tr.key] = false;
-});
-
-/* A plant showing a recessive trait can only be homozygous - that is the
-   student's lever, and it holds no matter where the plant came from.
-   What a dominant-looking plant carries depends on its provenance:
-     true-breeding - a stock line that has bred true for generations
-     unmarked      - stock of unrecorded history; two in three carry a
-                     hidden allele, matching an F2 population
-     field         - a seedling transplanted in, carrying whatever it
-                     inherited. This is where heterozygotes really come
-                     from: cross two true-breeding lines and every
-                     offspring is a carrier, though nothing on the plant
-                     says so. */
-function hiddenAlleles(which, key, wantDom){
-  if(!wantDom) return [0,0];
-  if(state.src[which] === 'true') return [1,1];
-  var b = state.bank[which][key];
-  if(!b.dom) b.dom = (Math.random() < 1/3) ? [1,1] : [1,0];
-  return b.dom.slice();
-}
-function syncParent(which){
-  var p = state[which];
-  if(state.src[which] === 'field' && state.adopted[which]){
-    TRAITS.forEach(function(tr){ p[tr.key] = state.adopted[which][tr.key].slice(); });
-    return;
-  }
-  TRAITS.forEach(function(tr){
-    p[tr.key] = hiddenAlleles(which, tr.key, state.want[which][tr.key]);
-  });
-}
-function lotLabel(which){
-  return state.gen[which] === 1
-    ? 'lot ' + state.lot[which]
-    : 'F' + (state.gen[which]-1) + ' plant';
-}
-/* Counts gathered from one pair of parents say nothing about a different
-   pair, so changing a parent retires the evidence. Transplanting is the
-   exception: it clears the counts but leaves the seedling standing, so the
-   same plant can be moved into both beds and selfed. */
-function clearCounts(){
-  TRAITS.forEach(function(tr){ state.tally[tr.key] = {dom:0, rec:0}; });
-  state.total = 0;
-  state.rain = [];
-  clearLayer();
-}
-function invalidateEvidence(){
-  clearCounts();
-  state.child = null;
-  state.playing = false;
-  state.finished = true;
-}
-
-function newLot(){
-  ['p1','p2'].forEach(function(which){
-    TRAITS.forEach(function(tr){ state.bank[which][tr.key] = {}; });
-    state.lot[which] = String.fromCharCode(65 + Math.floor(Math.random()*26)) +
-                       (10 + Math.floor(Math.random()*89));
-    if(state.src[which] === 'field'){ state.src[which] = 'unmarked'; state.adopted[which] = null; }
-    state.gen[which] = 1;
-    syncParent(which);
-  });
-}
-var RAIN_CAP = 100;
-TRAITS.forEach(function(tr){ state.tally[tr.key] = {dom:0, rec:0}; });
-
-var DUR = 7800;
-/* the bed, as fractions of canvas height: sky meets soil at HORIZON,
-   crop rows run from ROW_BACK to ROW_FRONT, the hero plant sits at FRONT */
-var HORIZON = 0.46, ROW_BACK = 0.55, ROW_FRONT = 0.86, FRONT = 0.94, ROWS = 5;
+var HORIZON = 0.46, ROW_BACK = 0.55, ROW_FRONT = 0.86, FRONT = 0.94, ROWS = 4;
 function rowFy(depth){ return ROW_BACK + (ROW_FRONT - ROW_BACK)*depth; }
+var RAIN_CAP = 44;
+var FULL = {drop:1, bury:1, root:1, grow:1, bloom:1, pod:1};
+
 function smallScreen(){
   return (window.innerWidth||1366) < 1180 || (window.innerHeight||768) < 780;
 }
 function clamp01(v){ return v<0?0:v>1?1:v; }
 function easeOut(t){ return 1-Math.pow(1-t,3); }
-function easeInOut(t){ return t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
-
-function phases(ms){
-  return {
-    drop : clamp01(ms/950),
-    bury : clamp01((ms-950)/650),
-    root : clamp01((ms-1450)/1100),
-    grow : clamp01((ms-2050)/3050),
-    bloom: clamp01((ms-4700)/1300),
-    pod  : clamp01((ms-6100)/1700)
-  };
-}
-var FULL = {drop:1, bury:1, root:1, grow:1, bloom:1, pod:1};
 
 /* ============================================================
-   DRAWING
+   GENETICS - only flower colour is the puzzle; the rest is noise
+   ============================================================ */
+var TRAITS = [
+  {key:'shape', dom:'Round',  rec:'Wrinkled'},
+  {key:'stem',  dom:'Tall',   rec:'Short'},
+  {key:'color', dom:'Violet', rec:'White'},
+  {key:'pos',   dom:'Axial',  rec:'Terminal'}
+];
+function isDom(a){ return a[0]===1 || a[1]===1; }
+function pickAllele(a){ return a[Math.random()<0.5?0:1]; }
+function crossAll(p,q){
+  var kid = {};
+  TRAITS.forEach(function(tr){ kid[tr.key] = [pickAllele(p[tr.key]), pickAllele(q[tr.key])]; });
+  return kid;
+}
+function randGeno(){
+  var r = Math.random();
+  return r < 0.34 ? [1,1] : r < 0.67 ? [1,0] : [0,0];
+}
+function looks(g){ return [isDom(g.stem), isDom(g.pos), isDom(g.shape)].join(','); }
+
+/* ---------- whimsical names ---------- */
+var FIRST = ['Barnaby','Clementine','Thistlewick','Pemberly','Mortimer','Ophelia',
+  'Winnifred','Archibald','Juniper','Bartholomew','Marigold','Rufus','Persimmon',
+  'Waldo','Hyacinth','Cornelius','Bramble','Tuppence','Figgis','Rosalind','Alistair',
+  'Dorothea','Humphrey','Petunia','Silas','Wilhelmina','Osgood','Clementina'];
+var LAST = ['Puddleblossom','Wobblestem','Thornbottom','Fiddlepea','Grumblesprout',
+  'Snickerpod','Higglebloom','Plumtangle','Muddyboots','Curlytendril','Bumblepetal',
+  'Rattlepod','Whistleleaf','Sniffleseed','Twiddlevine','Pockleberry','Frumblewick',
+  'Gigglestalk','Nettlebottom','Sprocketleaf','Dimplepod','Quibbleroot'];
+function makeName(taken){
+  for(var i=0;i<60;i++){
+    var n = FIRST[Math.floor(Math.random()*FIRST.length)] + ' ' +
+            LAST[Math.floor(Math.random()*LAST.length)];
+    if(taken.indexOf(n) < 0) return n;
+  }
+  return 'Pea Number ' + (Math.floor(Math.random()*900)+100);
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var state = {
+  phase: 'testing',          // testing | deciding | result | award
+  solved: 0, rounds: 0,
+  plants: [], tester: null,
+  testing: 0,
+  totalSown: 0,
+  cooldownUntil: 0,
+  pendingCall: false,
+  picked: [false,false],
+  code: '',
+  rain: []
+};
+
+/* Which plants carry white. A round is never handed out without at least
+   some variety across the six, but every pattern stays possible. */
+function drawPattern(){
+  var r = Math.random();
+  if(r < 0.35) return [true,false];
+  if(r < 0.70) return [false,true];
+  if(r < 0.90) return [true,true];
+  return [false,false];
+}
+
+function newRound(){
+  var pat = drawPattern();
+  var taken = [];
+  state.plants = [0,1].map(function(i){
+    var nm = makeName(taken); taken.push(nm);
+    return {
+      name: nm,
+      carrier: pat[i],
+      g: {color: pat[i] ? [1,0] : [1,1], stem: randGeno(), pos: randGeno(), shape: randGeno()},
+      sown: 0, white: 0
+    };
+  });
+  // make sure the two mystery plants don't look identical
+  var guard = 0;
+  while(looks(state.plants[0].g) === looks(state.plants[1].g) && guard++ < 20){
+    state.plants[1].g.stem = randGeno();
+    state.plants[1].g.pos  = randGeno();
+    state.plants[1].g.shape= randGeno();
+  }
+  state.tester = {g:{color:[0,0], stem:randGeno(), pos:randGeno(), shape:randGeno()}};
+  state.testing = 0;
+  state.totalSown = 0;
+  state.cooldownUntil = 0;
+  state.pendingCall = false;
+  state.picked = [false,false];
+  state.phase = 'testing';
+  state.rain = [];
+  clearLayer();
+  resetSlots();
+  markParents();
+  render();
+}
+
+/* ============================================================
+   ART AND GROWTH - shared with the breeding sim, under a daylight sky
    ============================================================ */
 function rng(seed){                       // tiny deterministic PRNG for decor
   var s = seed;
@@ -563,35 +444,105 @@ function sizeCanvas(cv){
   return {ctx:ctx, w:w, h:h};
 }
 
+/* Cloud shapes are generated once from a fixed seed, so they never drift
+   or flicker between frames - the sky is scenery, not animation. */
+var clouds = (function(){
+  var r = rng(20260917), out = [];
+  for(var i=0;i<8;i++){
+    var c = {x:(i+0.35+r()*0.3)/8, y:0.10+r()*0.46, s:0.55+r()*0.95, puffs:[]};
+    var n = 3 + Math.floor(r()*3);
+    for(var k=0;k<n;k++){
+      c.puffs.push({dx:(k-(n-1)/2)*0.58 + (r()-0.5)*0.22,
+                    dy:(r()-0.5)*0.20,
+                    rr:0.52 + r()*0.46});
+    }
+    out.push(c);
+  }
+  return out;
+})();
+
+function drawClouds(ctx,w,soilY){
+  var unit = Math.max(6, Math.min(w*0.042, soilY*0.13));
+  var step = w < 300 ? 3 : w < 520 ? 2 : 1;      // a small preview wants fewer
+  for(var i=0;i<clouds.length;i+=step){
+    var c = clouds[i];
+    var cx = c.x*w, cy = c.y*soilY, s = unit*c.s;
+    if(cy > soilY*0.74) continue;                  // keep them clear of the horizon
+    ctx.save();
+    ctx.fillStyle = 'rgba(214,230,241,.95)';       // shaded underside
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + s*0.40, s*1.55, s*0.34, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.96)';       // puffs on top
+    ctx.beginPath();
+    for(var k=0;k<c.puffs.length;k++){
+      var p = c.puffs[k];
+      ctx.moveTo(cx + p.dx*s + p.rr*s, cy + p.dy*s);
+      ctx.arc(cx + p.dx*s, cy + p.dy*s, p.rr*s, 0, Math.PI*2);
+    }
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
 function drawSky(ctx,w,soilY){
   var g = ctx.createLinearGradient(0,0,0,soilY);
-  g.addColorStop(0,'#101c16'); g.addColorStop(.55,'#16281f'); g.addColorStop(1,'#1d3527');
+  g.addColorStop(0,'#5d9ed2');
+  g.addColorStop(.58,'#95c4e4');
+  g.addColorStop(1,'#cfe3ec');
   ctx.fillStyle = g; ctx.fillRect(0,0,w,soilY);
-  // low glow behind the plant, like a grow lamp
-  var gl = ctx.createRadialGradient(w/2, soilY, 10, w/2, soilY, Math.max(w,soilY)*.75);
-  gl.addColorStop(0,'rgba(140,200,150,.13)'); gl.addColorStop(1,'rgba(140,200,150,0)');
-  ctx.fillStyle = gl; ctx.fillRect(0,0,w,soilY);
+  drawClouds(ctx,w,soilY);
+  var warm = ctx.createLinearGradient(0,soilY*0.70,0,soilY);
+  warm.addColorStop(0,'rgba(255,243,212,0)');
+  warm.addColorStop(1,'rgba(255,243,212,.5)');
+  ctx.fillStyle = warm; ctx.fillRect(0,soilY*0.70,w,soilY*0.30);
+  drawHedge(ctx,w,soilY);
 }
+
+/* A far hedgerow. Fixed bumps from the same seed, so it never shifts. */
+var hedge = (function(){
+  var r = rng(4242), out = [];
+  for(var i=0;i<26;i++) out.push(0.45 + r()*0.75);
+  return out;
+})();
+function drawHedge(ctx,w,soilY){
+  var hh = Math.max(3, soilY*0.045);
+  ctx.save();
+  ctx.fillStyle = '#7e9a6e';
+  ctx.beginPath();
+  ctx.moveTo(0, soilY);
+  for(var i=0;i<hedge.length;i++){
+    var x = w*i/(hedge.length-1);
+    ctx.lineTo(x, soilY - hh*hedge[i]);
+  }
+  ctx.lineTo(w, soilY);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'rgba(70,92,58,.5)';
+  ctx.fillRect(0, soilY-1, w, 1.5);
+  ctx.restore();
+}
+
 function drawSoil(ctx,w,h,soilY){
   var g = ctx.createLinearGradient(0,soilY,0,h);
-  g.addColorStop(0,'#5b3f2b'); g.addColorStop(1,'#33241a');
+  g.addColorStop(0,'#8d6c4a'); g.addColorStop(1,'#5b4028');
   ctx.fillStyle = g; ctx.fillRect(0,soilY,w,h-soilY);
-  ctx.fillStyle = '#75543a';
+  ctx.fillStyle = '#a8865e';
   ctx.fillRect(0,soilY,w,1.5);
   var band = h - soilY;
   for(var i=0;i<speckles.length;i++){
     var s = speckles[i];
     ctx.globalAlpha = s.a;
-    ctx.fillStyle = i%3 ? '#8a6444' : '#2a1d14';
+    ctx.fillStyle = i%3 ? '#a8845c' : '#4a3520';
     ctx.fillRect(s.x*w, soilY + s.y*band, s.s, s.s);
   }
   ctx.globalAlpha = 1;
   if(h - soilY > h*0.28){                     // a worked field recedes toward the horizon
     ctx.save();
     var haze = ctx.createLinearGradient(0,soilY,0,soilY+(h-soilY)*.35);
-    haze.addColorStop(0,'rgba(150,175,150,.14)'); haze.addColorStop(1,'rgba(150,175,150,0)');
+    haze.addColorStop(0,'rgba(212,230,238,.19)'); haze.addColorStop(1,'rgba(212,230,238,0)');
     ctx.fillStyle = haze; ctx.fillRect(0,soilY,w,(h-soilY)*.35);
-    ctx.strokeStyle = 'rgba(30,20,13,.30)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(58,40,24,.26)'; ctx.lineWidth = 1;
     for(var f=1;f<=7;f++){
       var d = Math.pow(f/7, 1.7);
       var y = soilY + (h-soilY)*d;
@@ -729,11 +680,11 @@ function drawPlant(ctx, cfg){
 
   // roots
   if(ph.root>0){
-    ctx.save(); ctx.globalAlpha = .5; ctx.strokeStyle='#caa77f'; ctx.lineWidth=1.1; ctx.lineCap='round';
+    ctx.save(); ctx.globalAlpha = .22; ctx.strokeStyle='#6f5436'; ctx.lineWidth=1; ctx.lineCap='round';
     for(var r=-1;r<=1;r++){
       ctx.beginPath(); ctx.moveTo(cfg.x, cfg.soilY);
-      ctx.quadraticCurveTo(cfg.x + r*10*ph.root, cfg.soilY + 12*ph.root,
-                           cfg.x + r*18*ph.root, cfg.soilY + 26*ph.root);
+      ctx.quadraticCurveTo(cfg.x + r*7*ph.root, cfg.soilY + 8*ph.root,
+                           cfg.x + r*12*ph.root, cfg.soilY + 17*ph.root);
       ctx.stroke();
     }
     ctx.restore();
@@ -780,7 +731,7 @@ function drawPlant(ctx, cfg){
 
   // flowers and pods
   // flower size has a floor - color and position are the traits being read
-  var fs = Math.max(4.6, cfg.maxH*(cfg.tall?.075:.085) + 2);
+  var fs = Math.max(6.6, cfg.maxH*(cfg.tall?.088:.098) + 2);
   var spots = [];
   if(cfg.axial){
     var au = cfg.tall ? [.42,.62,.80] : [.45,.78];
@@ -803,7 +754,7 @@ function drawPlant(ctx, cfg){
   });
 
   // a couple of harvested seeds resting on the soil once pods are full
-  if(ph.pod>.9 && cfg.maxH>70){
+  if(ph.pod>.9 && cfg.maxH>220){
     var sr = Math.max(3, cfg.maxH*.03);
     var fill = cfg.round ? '#dcc98c' : '#cdb679';
     drawSeed(ctx, cfg.x - cfg.maxH*.19, cfg.soilY - sr*.55, sr, cfg.round, fill, '#8a7442');
@@ -816,23 +767,47 @@ function drawPlant(ctx, cfg){
    germinates where it lands, and grows its own genotype. Positions
    are fractions of the canvas, so a resize doesn't disturb the field.
    ------------------------------------------------------------ */
+var sowSlot = 0;
+function resetSlots(){ sowSlot = 0; }
+
+/* Two plants from neighbouring rows landing on the same spot makes it hard
+   to tell which one opened white, so nudge a new seed clear of its
+   neighbours before it goes in. */
+function freeSpot(fx, depth){
+  for(var attempt=0; attempt<14; attempt++){
+    var clash = false;
+    for(var i=0;i<state.rain.length;i++){
+      var o = state.rain[i];
+      if(Math.abs(o.depth - depth) > 0.34) continue;      // far rows can overlap
+      if(Math.abs(o.fx - fx) < 0.052){ clash = true; break; }
+    }
+    if(!clash) break;
+    fx += 0.055;
+    if(fx > 0.945) fx -= 0.89;
+  }
+  return fx;
+}
 function sowSeeds(kids){
   for(var i=0;i<kids.length;i++){
+    /* a golden-ratio sequence spaces each new seed away from the ones
+       already planted, so ten plants never land in a heap */
+    var slot = sowSlot++;
     var k = kids[i];
-    var row = i % ROWS;
+    var row = slot % ROWS;
     var depth = ROWS>1 ? row/(ROWS-1) : 1;
     var jit = (Math.random()-0.5)*0.018;
     state.rain.push({
       depth: depth,
       rest: rowFy(depth) + jit,
-      fx: 0.045 + Math.random()*0.91,
+      fx: freeSpot(0.055 + 0.885*(((slot+0.5)*0.6180339887498949) % 1)
+                   + (Math.random()-0.5)*0.016, depth),
       fy: -0.05 - Math.random()*0.07,
       vy: 0,
       phase: Math.random()*6.283,
       scale: 0.85 + Math.random()*0.3,
       tall: isDom(k.stem), violet: isDom(k.color),
       axial: isDom(k.pos),  round: isDom(k.shape),
-      delay: i*(smallScreen() ? 74 : 44) + Math.random()*36,
+      delay: i*(smallScreen() ? 150 : 110) + Math.random()*60,
       bounced: false, landed: false, age: 0
     });
   }
@@ -891,7 +866,7 @@ function clearLayer(){
 function plantCfg(s,w,h,t,heroMaxH,ph){
   var sc = 0.38 + 0.62*s.depth;
   return {
-    x: s.fx*w, soilY: s.rest*h, maxH: heroMaxH*0.44*sc*s.scale,
+    x: s.fx*w, soilY: s.rest*h, maxH: heroMaxH*0.50*sc*s.scale,
     t: t, phase: s.phase,
     tall: s.tall, violet: s.violet, axial: s.axial, round: s.round,
     ph: ph
@@ -933,22 +908,24 @@ function drawPlotPlant(ctx,s,w,h,t,heroMaxH){
   ctx.restore();
 }
 
+
+
 /* ============================================================
-   PARENT PREVIEWS
+   PREVIEWS
    ============================================================ */
 var parentsDirty = true;
 function markParents(){ parentsDirty = true; }
 
-function drawParent(cv, p, t){
+function drawStill(cv, g, phase){
   var s = sizeCanvas(cv), ctx = s.ctx, w = s.w, h = s.h;
   ctx.clearRect(0,0,w,h);
   var soilY = h*.88;
   drawSky(ctx,w,soilY);
   drawSoil(ctx,w,h,soilY);
   drawPlant(ctx, {
-    x: w*.5, soilY: soilY, maxH: h*.72, t: t, phase: p===state.p1 ? 0 : 1.7,
-    tall: isDom(p.stem), violet: isDom(p.color), axial: isDom(p.pos), round: isDom(p.shape),
-    ph: FULL
+    x:w*.5, soilY:soilY, maxH:h*.72, t:0, phase:phase,
+    tall:isDom(g.stem), violet:isDom(g.color), axial:isDom(g.pos), round:isDom(g.shape),
+    ph:FULL
   });
 }
 
@@ -960,367 +937,345 @@ var field = document.getElementById('field');
 function drawField(t, dt){
   var s0 = sizeCanvas(field), ctx = s0.ctx, w = s0.w, h = s0.h;
   ctx.clearRect(0,0,w,h);
-  var horizon = h*HORIZON, frontY = h*FRONT;
+  var horizon = h*HORIZON;
   drawSky(ctx,w,horizon);
   drawSoil(ctx,w,h,horizon);
   updateRain(dt);
+  var baseMaxH = Math.min(h*0.60, w*0.42);
+  drawPlot(ctx,w,h,t,baseMaxH);
 
-  var heroMaxH = Math.min(h*0.52, w*0.38);
+  if(state.rain.length === 0 && state.phase === 'testing'){
+    ctx.save();
+    ctx.fillStyle = 'rgba(34,52,38,.62)';
+    ctx.font = '15px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Pick a plant on the left, then sow seeds and watch the flowers.',
+                 w*.5, h*.30);
+    ctx.restore();
+  }
+  // once the last of the seed budget has grown up, force the call
+  if(state.pendingCall && state.phase === 'testing' && allGrown()){
+    openDecision(true);
+  }
+}
+function allGrown(){
+  for(var i=0;i<state.rain.length;i++){
+    if(!state.rain[i].landed || state.rain[i].age < 3400) return false;
+  }
+  return true;
+}
 
-  if(state.child){
-    var ms = state.playing ? (t - state.t0) : DUR;
-    if(ms >= DUR && state.playing){
-      state.playing = false; state.finished = true; renderTransplant();
-    }
-    var ph = state.finished ? FULL : phases(ms);
-    var c = state.child;
-    var cfg = {
-      x: w*.5, soilY: frontY, maxH: heroMaxH, t: t, phase: .6,
-      tall: isDom(c.stem), violet: isDom(c.color), axial: isDom(c.pos), round: isDom(c.shape),
-      ph: ph
-    };
+/* ============================================================
+   SOWING
+   ============================================================ */
+function sow(){
+  if(state.phase !== 'testing') return;
+  if(Date.now() < state.cooldownUntil) return;
+  if(state.totalSown >= SEED_CAP) return;
+  var n = Math.min(SOW_SIZE, SEED_CAP - state.totalSown);
+  var m = state.plants[state.testing];
+  var kids = [];
+  for(var i=0;i<n;i++){
+    var kid = crossAll(m.g, state.tester.g);
+    kids.push(kid);
+    m.sown++;
+    if(!isDom(kid.color)) m.white++;
+    state.totalSown++;
+  }
+  sowSeeds(kids);
+  state.cooldownUntil = Date.now() + COOLDOWN_MS;
+  if(state.totalSown >= SEED_CAP) state.pendingCall = true;
+  render();
+  renderSowButton();          // immediate feedback, don't wait for the next tick
+}
 
-    // the hero seed falls, hops twice, then sinks under the surface.
-    // Clipping to the soil line is what makes it absorb - repainting the
-    // whole band would just erase it, since the band now starts at the horizon.
-    if(ph.bury < 1){
-      var r = Math.max(5, heroMaxH*.038);
-      var startY = -r*2, landY = frontY - r, y;
-      if(ph.drop < 1){
-        y = startY + (landY - startY)*(ph.drop*ph.drop);
-      }else{
-        var b = ph.bury, hopT = 0.55;
-        var hop  = b < hopT ? Math.abs(Math.sin(b/hopT*Math.PI*2))*(1-b/hopT)*r*1.9 : 0;
-        var sink = b < hopT ? 0 : ((b-hopT)/(1-hopT))*r*2.4;
-        y = landY - hop + sink;
-      }
-      ctx.save();
-      ctx.beginPath(); ctx.rect(0,0,w,frontY); ctx.clip();
-      drawSeed(ctx, w*.5, y, r, cfg.round, '#e3d094', '#8a7442');
-      ctx.restore();
-      if(ph.bury > 0.5){                       // disturbed earth where it went in
-        ctx.save();
-        ctx.globalAlpha = Math.min(1,(ph.bury-0.5)/0.5)*0.85;
-        ctx.fillStyle = '#7a5738';
-        ctx.beginPath(); ctx.ellipse(w*.5, frontY, r*2.2, r*0.62, 0, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#4a3323';
-        ctx.beginPath(); ctx.ellipse(w*.5, frontY+r*.12, r*1.1, r*0.3, 0, 0, Math.PI*2); ctx.fill();
-        ctx.restore();
-      }
-    }
+function selectPlant(i){
+  if(state.phase !== 'testing' || state.testing === i) return;
+  state.testing = i;
+  state.rain = [];           // one plant's seedlings at a time, so no mixing
+  clearLayer();
+  resetSlots();
+  markParents();
+  render();
+}
 
-    drawPlot(ctx,w,h,t,heroMaxH);      // rows behind
-    drawPlant(ctx, cfg);               // hero in front
+/* ============================================================
+   RENDERING THE PANELS
+   ============================================================ */
+function render(){
+  var cards = document.getElementById('cards');
+  if(!cards._wired){
+    Array.prototype.forEach.call(cards.children, function(b){
+      b.addEventListener('click', function(){ selectPlant(+b.getAttribute('data-i')); });
+    });
+    cards._wired = true;
+  }
+  [0,1].forEach(function(i){
+    var p = state.plants[i], b = cards.children[i];
+    var on = state.testing === i;
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.setAttribute('aria-label', p.name + (on ? ', selected for testing' : ', click to test this one'));
+    document.getElementById('nm' + i).textContent = p.name;
+    document.getElementById('ty' + i).textContent =
+      p.sown ? p.sown + ' sown / ' + p.white + ' white' : 'not yet tested';
+  });
+
+  var callBtn = document.getElementById('call');
+  var tried = state.plants[0].sown > 0 && state.plants[1].sown > 0;
+  callBtn.className = tried ? 'ready' : '';
+
+  document.getElementById('statSolved').textContent = state.solved + '/' + TO_WIN;
+  document.getElementById('statSeeds').textContent = (SEED_CAP - state.totalSown);
+
+  var led = document.getElementById('ledger');
+  var html = '<h3>Field record</h3>';
+  state.plants.forEach(function(p,i){
+    html += '<div class="lrow' + (state.testing===i?' on':'') + '">' +
+            '<span class="nm"><b>' + p.name.split(' ')[0] + '</b> ' +
+              p.name.split(' ')[1] + '</span>' +
+            '<span class="ct">' + p.sown + ' sown / ' + p.white + ' white</span></div>';
+  });
+  html += '<div class="lnote">Switching plants clears the bed. ' +
+          'These totals are kept.</div>';
+  led.innerHTML = html;
+  markParents();
+}
+
+function renderSowButton(){
+  var btn = document.getElementById('sow');
+  var txt = document.getElementById('sowTxt');
+  var fill = document.getElementById('sowFill');
+  if(state.phase !== 'testing'){ btn.disabled = true; txt.textContent = 'Sowing closed'; fill.style.width='0'; return; }
+  if(state.totalSown >= SEED_CAP){
+    btn.disabled = true; txt.textContent = 'Seed budget spent'; fill.style.width = '100%'; return;
+  }
+  var left = state.cooldownUntil - Date.now();
+  if(left > 0){
+    btn.disabled = true;
+    txt.textContent = 'Next sowing in ' + Math.ceil(left/1000) + 's';
+    fill.style.width = (100 - (left/COOLDOWN_MS)*100).toFixed(1) + '%';
   }else{
-    drawPlot(ctx,w,h,t,heroMaxH);
-    if(state.rain.length === 0){
-      ctx.save();
-      ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; ctx.setLineDash([4,6]);
-      ctx.beginPath();
-      ctx.moveTo(w*.5-42, frontY+8); ctx.quadraticCurveTo(w*.5, frontY+14, w*.5+42, frontY+8);
-      ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle='rgba(223,234,223,.5)';
-      ctx.font = '15px Georgia, serif';
-      ctx.textAlign='center';
-      ctx.fillText('Pick traits for both parents, then press Reproduce.', w*.5, h*.26);
-      ctx.restore();
-    }
+    btn.disabled = false;
+    var n = Math.min(SOW_SIZE, SEED_CAP - state.totalSown);
+    txt.textContent = 'Sow ' + n + ' seeds';
+    fill.style.width = '100%';
   }
 }
 
 /* ============================================================
-   UI
+   THE CALL
    ============================================================ */
-var SOURCES = [
-  {id:'true',     label:'True-breeding', abbr:'True-bred',
-   tip:'A stock line that has bred true for generations.'},
-  {id:'unmarked', label:'Unmarked',      abbr:'Unmarked',
-   tip:'Stock with no breeding record kept.'},
-  {id:'field',    label:'From field',    abbr:'Field',
-   tip:'Transplant the seedling growing out in the bed.'}
-];
+var overlay = document.getElementById('overlay');
+var card = document.getElementById('card');
 
-/* Transplant the seedling standing in the field into one of the beds. The
-   seedling is left where it is, so the same plant can be moved into both
-   beds and selfed - which is how an F2 gets made. */
-function adoptField(which){
-  if(!state.child) return;
-  state.adopted[which] = {};
-  TRAITS.forEach(function(tr){ state.adopted[which][tr.key] = state.child[tr.key].slice(); });
-  state.gen[which] = state.childGen;
-  state.src[which] = 'field';
-  syncParent(which);
-  clearCounts();
-  refresh();
-}
+function openDecision(forced){
+  state.phase = 'deciding';
+  var html = '<h2>Which plant carries white?</h2>' +
+    '<p class="lead">' + (forced
+      ? 'Your seed budget is spent. Time to decide, from memory.'
+      : 'Call it whenever you are ready. No numbers here - go on what you saw.') +
+    '</p><div class="choice">';
+  state.plants.forEach(function(p,i){
+    html += '<button type="button" data-i="' + i + '" aria-pressed="' +
+            (state.picked[i]?'true':'false') + '">' +
+            '<span>' + p.name + '</span></button>';
+  });
+  html += '</div><p class="hint">Select both if both carry it. ' +
+          'Select neither if you think neither does.</p>' +
+          '<div class="actions"><button class="btn" id="submit">Submit answer</button>' +
+          (forced ? '' : '<button class="btn ghost" id="back">Keep testing</button>') +
+          '</div>';
+  card.className = 'card';
+  overlay.className = 'show';
+  card.innerHTML = html;
 
-function buildSource(container, which){
-  container.innerHTML = '';
-  var seg = document.createElement('div'); seg.className = 'seg';
-  SOURCES.forEach(function(src){
-    var b = document.createElement('button');
-    b.type = 'button'; b.title = src.tip;
-    b.innerHTML = '<span class="full">' + src.label + '</span>' +
-                  '<span class="abbr">' + src.abbr + '</span>';
+  Array.prototype.forEach.call(card.querySelectorAll('.choice button'), function(b){
     b.addEventListener('click', function(){
-      if(src.id === 'field'){
-        adoptField(which);
-        return;
-      }else{
-        if(state.src[which] === src.id) return;
-        state.src[which] = src.id;
-        state.adopted[which] = null;
-        state.gen[which] = 1;
-        syncParent(which);
-        invalidateEvidence();
-      }
-      refresh();
-    });
-    seg.appendChild(b);
-  });
-  container.appendChild(seg);
-  container._seg = seg;
-}
-
-function refreshSource(container, which){
-  Array.prototype.forEach.call(container._seg.children, function(b, i){
-    var src = SOURCES[i];
-    b.setAttribute('aria-pressed', state.src[which] === src.id ? 'true' : 'false');
-    b.disabled = (src.id === 'field' && !state.child && state.src[which] !== 'field');
-  });
-}
-
-function buildTraits(container, which){
-  var p = state[which];
-  container.innerHTML = '';
-  TRAITS.forEach(function(tr){
-    var row = document.createElement('div'); row.className = 'trait';
-    var name = document.createElement('div'); name.className = 'trait-name';
-    name.title = tr.name;
-    name.innerHTML = '<span class="full">' + tr.name + '</span>' +
-                     '<span class="abbr">' + tr.abbr + '</span>';
-    row.appendChild(name);
-    var seg = document.createElement('div'); seg.className = 'seg';
-    [true,false].forEach(function(dominant){
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = label(tr, dominant);
-      b.title = (dominant ? tr.dom : tr.rec) + ' ' + tr.name.toLowerCase();
-      b.addEventListener('click', function(){
-        if(state.want[which][tr.key] === dominant) return;
-        state.want[which][tr.key] = dominant;
-        syncParent(which);
-        invalidateEvidence();
-        refresh();
-      });
-      seg.appendChild(b);
-    });
-    row.appendChild(seg);
-    container.appendChild(row);
-    row._tr = tr; row._name = name; row._seg = seg;
-  });
-}
-
-function refreshTraits(container, which){
-  var locked = state.src[which] === 'field';
-  var p = state[which];
-  Array.prototype.forEach.call(container.children, function(row){
-    var tr = row._tr;
-    var showsDom = locked ? isDom(p[tr.key]) : state.want[which][tr.key];
-    Array.prototype.forEach.call(row._seg.children, function(b, i){
-      b.setAttribute('aria-pressed', (i === 0) === showsDom ? 'true' : 'false');
-      b.disabled = locked;
+      var i = +b.getAttribute('data-i');
+      state.picked[i] = !state.picked[i];
+      b.setAttribute('aria-pressed', state.picked[i]?'true':'false');
     });
   });
+  document.getElementById('submit').addEventListener('click', judge);
+  var back = document.getElementById('back');
+  if(back) back.addEventListener('click', function(){
+    overlay.className = '';
+    state.phase = 'testing';
+  });
+  renderSowButton();
 }
 
-function describe(p){
-  return [ phen(TRAITS[1],p.stem), phen(TRAITS[2],p.color).toLowerCase() + ' flowers',
-           phen(TRAITS[3],p.pos).toLowerCase(), phen(TRAITS[0],p.shape).toLowerCase() + ' seed'
-         ].join(' / ');
+function judge(){
+  var right = state.plants.every(function(p,i){ return p.carrier === state.picked[i]; });
+  state.rounds++;
+  if(right) state.solved++;
+  state.phase = 'result';
+
+  var html = '<div class="banner ' + (right ? 'right' : 'wrong') + '">' +
+             '<span class="glyph"></span><div>' +
+             '<h2>' + (right ? 'Correct' : 'Not correct') + '</h2>' +
+             '<p class="lead">' + (right
+               ? 'Your reading of the seedlings holds up.'
+               : 'Here is what the plants were actually carrying.') + '</p>' +
+             '</div></div><div class="verdict">';
+  state.plants.forEach(function(p){
+    var why;
+    if(p.sown === 0){
+      why = 'You never crossed this one, so there was nothing to go on.';
+    }else if(p.white > 0){
+      why = p.white + ' of its ' + p.sown + ' seedlings opened white. A plant with ' +
+            'nothing but violet to give could not have produced a single one.';
+    }else{
+      why = 'None of its ' + p.sown + ' seedlings came up white. A carrier crossed ' +
+            'to white throws white about half the time, so ' + p.sown +
+            ' in a row without one makes that very unlikely.';
+    }
+    html += '<div class="vrow ' + (p.carrier?'yes':'no') + '"><b>' + p.name + '</b> ' +
+            (p.carrier ? 'was carrying white.' : 'was pure violet.') +
+            '<span>' + why + '</span></div>';
+  });
+  html += '</div><div class="pips">';
+  for(var i=0;i<TO_WIN;i++) html += '<span class="pip' + (i<state.solved?' on':'') + '"></span>';
+  html += '</div><div class="actions"><button class="btn" id="next">' +
+          (right ? 'Next pair' : 'Try another pair') + '</button>' +
+          '<span class="stat">Solved ' + state.solved + ' of ' + TO_WIN +
+          ' in ' + state.rounds + ' tries</span></div>';
+  card.className = 'card ' + (right ? 'right' : 'wrong');
+  overlay.className = 'show ' + (right ? 'right' : 'wrong');
+  card.innerHTML = html;
+  document.getElementById('next').addEventListener('click', function(){
+    if(state.solved >= TO_WIN){ showAward(); return; }
+    overlay.className = '';
+    newRound();
+  });
+  renderSowButton();
 }
 
-function renderReadout(){
-  var el = document.getElementById('readout');
-  if(!state.child){
-    el.innerHTML = '<h3>No seed yet</h3><p class="empty">Each parent passes something down, ' +
-      'but what a plant carries is not written on the outside. Pick how each parent looks, ' +
-      'press Reproduce, and see what comes up.</p>';
-    return;
+/* Completion code: five digits that always add to 9, which also means the
+   whole number is divisible by 9 - a calculator check. The FIRST digit
+   carries how many tries it took: first digit + 5 = attempts, with 9
+   meaning fourteen or more. So 14220 is a clean six-round run;
+   53103 took eight tries. */
+function makeCode(attempts){
+  var d1 = Math.max(1, Math.min(9, attempts - 5));
+  var rest = 9 - d1;
+  var digits = [0,0,0,0];
+  for(var i=0;i<rest;i++){
+    var slot;
+    do { slot = Math.floor(Math.random()*4); } while(digits[slot] >= 9);
+    digits[slot]++;
   }
-  var c = state.child;
-  var html = '<h3>This seedling &middot; F' + (state.childGen-1) + '</h3><div class="sub">' +
-             lotLabel('p1') + ' &times; ' + lotLabel('p2') + '</div><div class="res">';
-  TRAITS.forEach(function(tr){
-    var ph = phen(tr, c[tr.key]);
-    var shown = label(tr, isDom(c[tr.key]));
-    var extra = POS_NOTE[ph] ? ', ' + POS_NOTE[ph] : '';
-    var novel = !isDom(c[tr.key]) && isDom(state.p1[tr.key]) && isDom(state.p2[tr.key]);
-    html += '<div class="g">' + tr.name.split(' ')[0] + '</div>' +
-            '<div class="p">' + shown + extra +
-            (novel ? '<br><em>neither parent looked like this</em>' : '') + '</div>';
-  });
-  html += '</div>';
-  el.innerHTML = html;
-  renderKey();
+  return '' + d1 + digits.join('');
 }
 
-/* Teacher's answer key - hidden from the board, toggled with Shift+K */
-function renderKey(){
-  var el = document.getElementById('answerkey');
-  if(!el) return;
-  el.style.display = state.key ? 'block' : 'none';
-  if(!state.key) return;
-  var html = '<h3>Answer key <span>Shift+K</span></h3><div class="res">';
-  TRAITS.forEach(function(tr){
-    html += '<div class="g">' + geno(tr, state.p1[tr.key]) + ' &times; ' +
-            geno(tr, state.p2[tr.key]) + '</div>' +
-            '<div class="p"><em>' + tr.name.toLowerCase() + ' &rarr; ' +
-            expectedRatio(state.p1[tr.key], state.p2[tr.key]) + '</em></div>';
-  });
-  html += '</div>';
-  el.innerHTML = html;
-}
-
-function renderTransplant(){
-  var el = document.getElementById('transplant');
-  if(!el) return;
-  var show = !!state.child && state.finished;
-  el.style.display = show ? 'flex' : 'none';
-  if(!show) return;
-  el.querySelector('.tp-label').textContent =
-    'Move this F' + (state.childGen-1) + ' plant into:';
-}
-
-function renderLedger(){
-  var el = document.getElementById('ledger');
-  if(state.total === 0){
-    el.innerHTML = '<h3>Seed count <span>(this cross)</span></h3>' +
-      '<div class="row"><span class="lbl">Sow a batch and count what comes up.</span></div>';
-    return;
+function copyCode(btn){
+  var txt = state.code;
+  function done(){
+    btn.textContent = 'Copied';
+    setTimeout(function(){ btn.textContent = 'Copy'; }, 1800);
   }
-  var html = '<h3>Seed count <span>' + state.total + ' from this cross</span></h3>';
-  TRAITS.forEach(function(tr){
-    var t = state.tally[tr.key];
-    var pct = Math.round(t.dom / state.total * 100);
-    html += '<div class="row"><span class="lbl"><b>' + t.dom + '</b> ' + tr.dom.toLowerCase() +
-            '</span><span class="num">' + t.rec + ' ' + tr.rec.toLowerCase() + '</span></div>' +
-            '<div class="bar"><i style="width:' + pct + '%"></i></div>';
-  });
-  el.innerHTML = html;
-}
-
-function countChild(c){
-  TRAITS.forEach(function(tr){
-    state.tally[tr.key][ isDom(c[tr.key]) ? 'dom' : 'rec' ]++;
-  });
-  state.total++;
-}
-
-function refresh(){
-  refreshSource(document.getElementById('src1'), 'p1');
-  refreshSource(document.getElementById('src2'), 'p2');
-  refreshTraits(document.getElementById('traits1'), 'p1');
-  refreshTraits(document.getElementById('traits2'), 'p2');
-  document.getElementById('pheno1').textContent = describe(state.p1);
-  document.getElementById('pheno2').textContent = describe(state.p2);
-  document.getElementById('lot1').textContent = lotLabel('p1');
-  document.getElementById('lot2').textContent = lotLabel('p2');
-  renderKey();
-  renderReadout();
-  renderLedger();
-  renderTransplant();
-  markParents();
-}
-
-/* ---------- actions ---------- */
-var btn = document.getElementById('reproduce');
-
-btn.addEventListener('click', function(){
-  state.childGen = Math.max(state.gen.p1, state.gen.p2) + 1;
-  state.child = crossAll(state.p1, state.p2);
-  countChild(state.child);
-  state.t0 = performance.now();
-  state.playing = true;
-  state.finished = false;
-  refresh();          // without this the "From field" pill never un-disables
-});
-
-document.getElementById('tp1').addEventListener('click', function(){ adoptField('p1'); });
-document.getElementById('tp2').addEventListener('click', function(){ adoptField('p2'); });
-
-document.getElementById('draw').addEventListener('click', function(){
-  newLot();
-  invalidateEvidence();
-  refresh();
-});
-
-document.addEventListener('keydown', function(e){
-  if(e.key === 'K' && e.shiftKey){ state.key = !state.key; renderKey(); }
-});
-
-document.getElementById('skip').addEventListener('click', function(){
-  if(state.child){ state.playing = false; state.finished = true; renderTransplant(); }
-});
-
-document.getElementById('fast').addEventListener('click', function(){
-  var kids = [];
-  for(var i=0;i<50;i++){
-    var kid = crossAll(state.p1, state.p2);
-    countChild(kid);
-    kids.push(kid);
+  function fallback(){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      done();
+    }catch(e){ btn.textContent = 'Select it by hand'; }
   }
-  sowSeeds(kids);
-  renderLedger();
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done, fallback);
+    }else{ fallback(); }
+  }catch(e){ fallback(); }
+}
+
+function showAward(){
+  state.phase = 'award';
+  state.code = makeCode(state.rounds);
+  card.innerHTML =
+    '<h2>The Mendel Award</h2>' +
+    '<p class="lead">For reading what a plant keeps hidden.</p>' +
+    '<canvas id="awardCanvas"></canvas>' +
+    '<p class="medal">Six mysteries solved in <b>' + state.rounds + '</b> attempts. ' +
+    'You found the hidden white by doing what Mendel did: crossing to a plant ' +
+    'that could only give white, then counting what came up.</p>' +
+    '<div class="code"><span class="codeLabel">Completion code</span>' +
+    '<span class="codeVal" id="codeVal">' + state.code + '</span>' +
+    '<button class="btn ghost" id="copyCode">Copy</button></div>' +
+    '<p class="codeNote">Hand this in. It is generated from your run.</p>' +
+    '<div class="actions"><button class="btn" id="again">Start a new garden</button></div>';
+  card.className = 'card right';
+  overlay.className = 'show right';
+  drawAward();
+  var cp = document.getElementById('copyCode');
+  if(cp) cp.addEventListener('click', function(){ copyCode(cp); });
+  document.getElementById('again').addEventListener('click', function(){
+    state.solved = 0; state.rounds = 0; state.code = '';
+    overlay.className = '';
+    newRound();
+  });
+  renderSowButton();
+}
+
+function drawAward(){
+  var cv = document.getElementById('awardCanvas');
+  if(!cv) return;
+  var s = sizeCanvas(cv), ctx = s.ctx, w = s.w, h = s.h;
+  var soilY = h*.9;
+  drawSky(ctx,w,soilY);
+  drawSoil(ctx,w,h,soilY);
+  var specs = [
+    {x:0.22, violet:true,  tall:true,  axial:true,  round:true},
+    {x:0.5,  violet:false, tall:true,  axial:false, round:false},
+    {x:0.78, violet:true,  tall:true,  axial:true,  round:false}
+  ];
+  specs.forEach(function(sp,i){
+    drawPlant(ctx, {
+      x:w*sp.x, soilY:soilY, maxH:h*.76, t:0, phase:i*1.4,
+      tall:sp.tall, violet:sp.violet, axial:sp.axial, round:sp.round, ph:FULL
+    });
+  });
+}
+
+/* ============================================================
+   WIRING
+   ============================================================ */
+document.getElementById('sow').addEventListener('click', sow);
+document.getElementById('call').addEventListener('click', function(){
+  if(state.phase === 'testing') openDecision(false);
 });
+window.addEventListener('resize', markParents);
+window.addEventListener('load', markParents);
 
-document.getElementById('reset').addEventListener('click', function(){
-  TRAITS.forEach(function(tr){ state.tally[tr.key] = {dom:0, rec:0}; });
-  state.total = 0;
-  state.rain = [];
-  clearLayer();
-  renderLedger();
-});
+var cv0 = document.getElementById('cv0'),
+    cv1 = document.getElementById('cv1'),
+    cvT = document.getElementById('cvT');
+var lastT = 0, lastSize = {cv0:'', cv1:'', cvT:''}, lastBtn = 0;
 
-/* ---------- boot ---------- */
-newLot();
-buildSource(document.getElementById('src1'), 'p1');
-buildSource(document.getElementById('src2'), 'p2');
-buildTraits(document.getElementById('traits1'), 'p1');
-buildTraits(document.getElementById('traits2'), 'p2');
-refresh();
-
-var cv1 = document.getElementById('cv1'), cv2 = document.getElementById('cv2');
-var lastT = 0;
-var lastSize = {cv1:'', cv2:''};
-
-/* Each preview is measured on its own every frame and repainted only when its
-   box actually changes. A canvas with no box yet has not been laid out, so it
-   is never counted as painted - otherwise a preview that was blank on the
-   first frame stays blank until the window happens to resize. */
-function paintParent(cv, p, key, force){
+function paintStill(cv, g, key, phase, force){
   var r = cv.getBoundingClientRect();
   var w = Math.round(r.width), h = Math.round(r.height);
   if(w < 2 || h < 2) return false;
   var sig = w + 'x' + h;
-  if(force || sig !== lastSize[key]){
-    lastSize[key] = sig;
-    drawParent(cv, p, 0);
-  }
+  if(force || sig !== lastSize[key]){ lastSize[key] = sig; drawStill(cv, g, phase); }
   return true;
 }
 
 function loop(t){
   var dt = lastT ? Math.min(48, t - lastT) : 16;
   lastT = t;
-  var ok1 = paintParent(cv1, state.p1, 'cv1', parentsDirty);
-  var ok2 = paintParent(cv2, state.p2, 'cv2', parentsDirty);
-  if(parentsDirty && ok1 && ok2) parentsDirty = false;
+  var ok0 = paintStill(cv0, state.plants[0].g, 'cv0', 0.0, parentsDirty);
+  var ok1 = paintStill(cv1, state.plants[1].g, 'cv1', 1.1, parentsDirty);
+  var okT = paintStill(cvT, state.tester.g,   'cvT', 1.9, parentsDirty);
+  if(parentsDirty && ok0 && ok1 && okT) parentsDirty = false;
+  if(t - lastBtn > 180){ lastBtn = t; renderSowButton(); }
   drawField(t, dt);
   requestAnimationFrame(loop);
 }
-window.addEventListener('resize', markParents);
-window.addEventListener('load', markParents);
+
+newRound();
 requestAnimationFrame(loop);
 
 })();
