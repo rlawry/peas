@@ -185,6 +185,22 @@
   .empty{font-size:12.5px;color:var(--dim);line-height:1.5}
 
   .lot{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:400;letter-spacing:0}
+  #transplant{
+    display:none;
+    position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+    align-items:center;gap:8px;
+    background:rgba(16,27,21,.94);
+    border:1px solid var(--edge);
+    border-radius:3px;padding:7px 10px;
+    white-space:nowrap;
+  }
+  .tp-label{font-size:12.5px;color:var(--dim)}
+  .tp-btn{
+    background:transparent;border:1px solid var(--edge);border-radius:3px;
+    font-size:12.5px;padding:4px 10px;color:var(--pale);
+    transition:background .12s,border-color .12s;
+  }
+  .tp-btn:hover{background:var(--violet-deep);border-color:var(--violet)}
   #answerkey{
     display:none;
     position:absolute;right:12px;bottom:12px;width:238px;
@@ -211,7 +227,7 @@
   .row .lbl b{color:var(--pale);font-weight:500}
   .row .num{font-family:var(--mono);font-size:11.5px;color:var(--wheat)}
 
-  /* Chromebook tier , 1366x768 leaves roughly 620px of viewport */
+  /* Chromebook tier - 1366x768 leaves roughly 620px of viewport */
   @media (max-height:780px), (max-width:1180px){
     body{font-size:14px}
     .full{display:none}
@@ -245,7 +261,23 @@
     #ledger h3{font-size:12px;margin-bottom:5px}
     .row{font-size:11px;margin-bottom:4px}
     .bar{height:4px}
-    #answerkey{right:8px;bottom:8px;width:200px;padding:8px 10px}
+    #transplant{
+    display:none;
+    position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+    align-items:center;gap:8px;
+    background:rgba(16,27,21,.94);
+    border:1px solid var(--edge);
+    border-radius:3px;padding:7px 10px;
+    white-space:nowrap;
+  }
+  .tp-label{font-size:12.5px;color:var(--dim)}
+  .tp-btn{
+    background:transparent;border:1px solid var(--edge);border-radius:3px;
+    font-size:12.5px;padding:4px 10px;color:var(--pale);
+    transition:background .12s,border-color .12s;
+  }
+  .tp-btn:hover{background:var(--violet-deep);border-color:var(--violet)}
+  #answerkey{right:8px;bottom:8px;width:200px;padding:8px 10px}
   }
   /* smallest Chromebooks and heavy browser chrome */
   @media (max-height:640px){
@@ -265,6 +297,22 @@
     #field{height:52vh}
     #readout{position:static;width:auto;margin:12px}
     .lot{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:400;letter-spacing:0}
+  #transplant{
+    display:none;
+    position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+    align-items:center;gap:8px;
+    background:rgba(16,27,21,.94);
+    border:1px solid var(--edge);
+    border-radius:3px;padding:7px 10px;
+    white-space:nowrap;
+  }
+  .tp-label{font-size:12.5px;color:var(--dim)}
+  .tp-btn{
+    background:transparent;border:1px solid var(--edge);border-radius:3px;
+    font-size:12.5px;padding:4px 10px;color:var(--pale);
+    transition:background .12s,border-color .12s;
+  }
+  .tp-btn:hover{background:var(--violet-deep);border-color:var(--violet)}
   #answerkey{
     display:none;
     position:absolute;right:12px;bottom:12px;width:238px;
@@ -314,7 +362,7 @@
   <main id="stage">
     <div id="tools">
       <h1>Mendel's Garden</h1>
-      <button class="tool" id="draw" title="Fresh plants from the seed stock , same looks, different makeup">Draw new plants</button>
+      <button class="tool" id="draw" title="Fresh plants from the seed stock - same looks, different makeup">Draw new plants</button>
       <button class="tool" id="skip">Finish growing</button>
       <button class="tool" id="fast">Cross 50 more</button>
       <button class="tool" id="reset">Clear the count</button>
@@ -323,6 +371,11 @@
       <canvas id="field"></canvas>
       <div id="readout"></div>
       <div id="ledger"></div>
+      <div id="transplant">
+        <span class="tp-label"></span>
+        <button class="tp-btn" id="tp1">Parent 1</button>
+        <button class="tp-btn" id="tp2">Parent 2</button>
+      </div>
       <div id="answerkey"></div>
     </div>
   </main>
@@ -400,13 +453,13 @@ TRAITS.forEach(function(tr){
   state.want.p1[tr.key] = true; state.want.p2[tr.key] = false;
 });
 
-/* A plant showing a recessive trait can only be homozygous , that is the
+/* A plant showing a recessive trait can only be homozygous - that is the
    student's lever, and it holds no matter where the plant came from.
    What a dominant-looking plant carries depends on its provenance:
-     true-breeding , a stock line that has bred true for generations
-     unmarked      , stock of unrecorded history; two in three carry a
+     true-breeding - a stock line that has bred true for generations
+     unmarked      - stock of unrecorded history; two in three carry a
                      hidden allele, matching an F2 population
-     field         , a seedling transplanted in, carrying whatever it
+     field         - a seedling transplanted in, carrying whatever it
                      inherited. This is where heterozygotes really come
                      from: cross two true-breeding lines and every
                      offspring is a carrier, though nothing on the plant
@@ -726,7 +779,7 @@ function drawPlant(ctx, cfg){
   if(g>.9 && cfg.axial) drawTendril(ctx, stemX(1), stemY(1), cfg.maxH*.12, clamp01((g-.9)/.1), false);
 
   // flowers and pods
-  // flower size has a floor , color and position are the traits being read
+  // flower size has a floor - color and position are the traits being read
   var fs = Math.max(4.6, cfg.maxH*(cfg.tall?.075:.085) + 2);
   var spots = [];
   if(cfg.axial){
@@ -916,7 +969,9 @@ function drawField(t, dt){
 
   if(state.child){
     var ms = state.playing ? (t - state.t0) : DUR;
-    if(ms >= DUR && state.playing){ state.playing = false; state.finished = true; }
+    if(ms >= DUR && state.playing){
+      state.playing = false; state.finished = true; renderTransplant();
+    }
     var ph = state.finished ? FULL : phases(ms);
     var c = state.child;
     var cfg = {
@@ -926,7 +981,7 @@ function drawField(t, dt){
     };
 
     // the hero seed falls, hops twice, then sinks under the surface.
-    // Clipping to the soil line is what makes it absorb , repainting the
+    // Clipping to the soil line is what makes it absorb - repainting the
     // whole band would just erase it, since the band now starts at the horizon.
     if(ph.bury < 1){
       var r = Math.max(5, heroMaxH*.038);
@@ -985,6 +1040,20 @@ var SOURCES = [
    tip:'Transplant the seedling growing out in the bed.'}
 ];
 
+/* Transplant the seedling standing in the field into one of the beds. The
+   seedling is left where it is, so the same plant can be moved into both
+   beds and selfed - which is how an F2 gets made. */
+function adoptField(which){
+  if(!state.child) return;
+  state.adopted[which] = {};
+  TRAITS.forEach(function(tr){ state.adopted[which][tr.key] = state.child[tr.key].slice(); });
+  state.gen[which] = state.childGen;
+  state.src[which] = 'field';
+  syncParent(which);
+  clearCounts();
+  refresh();
+}
+
 function buildSource(container, which){
   container.innerHTML = '';
   var seg = document.createElement('div'); seg.className = 'seg';
@@ -995,13 +1064,8 @@ function buildSource(container, which){
                   '<span class="abbr">' + src.abbr + '</span>';
     b.addEventListener('click', function(){
       if(src.id === 'field'){
-        if(!state.child) return;
-        state.adopted[which] = {};
-        TRAITS.forEach(function(tr){ state.adopted[which][tr.key] = state.child[tr.key].slice(); });
-        state.gen[which] = state.childGen;
-        state.src[which] = 'field';
-        syncParent(which);
-        clearCounts();          // the seedling stays put so it can fill both beds
+        adoptField(which);
+        return;
       }else{
         if(state.src[which] === src.id) return;
         state.src[which] = src.id;
@@ -1073,7 +1137,7 @@ function refreshTraits(container, which){
 function describe(p){
   return [ phen(TRAITS[1],p.stem), phen(TRAITS[2],p.color).toLowerCase() + ' flowers',
            phen(TRAITS[3],p.pos).toLowerCase(), phen(TRAITS[0],p.shape).toLowerCase() + ' seed'
-         ].join(' · ');
+         ].join(' / ');
 }
 
 function renderReadout(){
@@ -1101,7 +1165,7 @@ function renderReadout(){
   renderKey();
 }
 
-/* Teacher's answer key , hidden from the board, toggled with Shift+K */
+/* Teacher's answer key - hidden from the board, toggled with Shift+K */
 function renderKey(){
   var el = document.getElementById('answerkey');
   if(!el) return;
@@ -1118,14 +1182,24 @@ function renderKey(){
   el.innerHTML = html;
 }
 
+function renderTransplant(){
+  var el = document.getElementById('transplant');
+  if(!el) return;
+  var show = !!state.child && state.finished;
+  el.style.display = show ? 'flex' : 'none';
+  if(!show) return;
+  el.querySelector('.tp-label').textContent =
+    'Move this F' + (state.childGen-1) + ' plant into:';
+}
+
 function renderLedger(){
   var el = document.getElementById('ledger');
   if(state.total === 0){
-    el.innerHTML = '<h3>Seed count <span>, this cross</span></h3>' +
+    el.innerHTML = '<h3>Seed count <span>(this cross)</span></h3>' +
       '<div class="row"><span class="lbl">Sow a batch and count what comes up.</span></div>';
     return;
   }
-  var html = '<h3>Seed count <span>, ' + state.total + ' from this cross</span></h3>';
+  var html = '<h3>Seed count <span>' + state.total + ' from this cross</span></h3>';
   TRAITS.forEach(function(tr){
     var t = state.tally[tr.key];
     var pct = Math.round(t.dom / state.total * 100);
@@ -1155,6 +1229,7 @@ function refresh(){
   renderKey();
   renderReadout();
   renderLedger();
+  renderTransplant();
   markParents();
 }
 
@@ -1168,9 +1243,11 @@ btn.addEventListener('click', function(){
   state.t0 = performance.now();
   state.playing = true;
   state.finished = false;
-  renderReadout();
-  renderLedger();
+  refresh();          // without this the "From field" pill never un-disables
 });
+
+document.getElementById('tp1').addEventListener('click', function(){ adoptField('p1'); });
+document.getElementById('tp2').addEventListener('click', function(){ adoptField('p2'); });
 
 document.getElementById('draw').addEventListener('click', function(){
   newLot();
@@ -1183,7 +1260,7 @@ document.addEventListener('keydown', function(e){
 });
 
 document.getElementById('skip').addEventListener('click', function(){
-  if(state.child){ state.playing = false; state.finished = true; }
+  if(state.child){ state.playing = false; state.finished = true; renderTransplant(); }
 });
 
 document.getElementById('fast').addEventListener('click', function(){
@@ -1214,27 +1291,36 @@ buildTraits(document.getElementById('traits2'), 'p2');
 refresh();
 
 var cv1 = document.getElementById('cv1'), cv2 = document.getElementById('cv2');
-var lastT = 0, sizeCheck = 0, seenW = 0, seenH = 0;
+var lastT = 0;
+var lastSize = {cv1:'', cv2:''};
+
+/* Each preview is measured on its own every frame and repainted only when its
+   box actually changes. A canvas with no box yet has not been laid out, so it
+   is never counted as painted - otherwise a preview that was blank on the
+   first frame stays blank until the window happens to resize. */
+function paintParent(cv, p, key, force){
+  var r = cv.getBoundingClientRect();
+  var w = Math.round(r.width), h = Math.round(r.height);
+  if(w < 2 || h < 2) return false;
+  var sig = w + 'x' + h;
+  if(force || sig !== lastSize[key]){
+    lastSize[key] = sig;
+    drawParent(cv, p, 0);
+  }
+  return true;
+}
+
 function loop(t){
   var dt = lastT ? Math.min(48, t - lastT) : 16;
   lastT = t;
-  // the previews only change when a parent does, so they are not redrawn
-  // every frame , that is two full plants and six gradients saved per frame
-  if(++sizeCheck % 30 === 0){
-    var r = cv1.getBoundingClientRect();
-    if(Math.round(r.width) !== seenW || Math.round(r.height) !== seenH){
-      seenW = Math.round(r.width); seenH = Math.round(r.height); parentsDirty = true;
-    }
-  }
-  if(parentsDirty){
-    drawParent(cv1, state.p1, 0);
-    drawParent(cv2, state.p2, 0);
-    parentsDirty = false;
-  }
+  var ok1 = paintParent(cv1, state.p1, 'cv1', parentsDirty);
+  var ok2 = paintParent(cv2, state.p2, 'cv2', parentsDirty);
+  if(parentsDirty && ok1 && ok2) parentsDirty = false;
   drawField(t, dt);
   requestAnimationFrame(loop);
 }
 window.addEventListener('resize', markParents);
+window.addEventListener('load', markParents);
 requestAnimationFrame(loop);
 
 })();
