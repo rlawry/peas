@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mendel's Garden — Pea Plant Cross</title>
+<style>
+  :root{
+    --night:#132019;
+    --bed:#1b2d24;
+    --bed-2:#213629;
+    --edge:#31533f;
+    --edge-soft:#26402f;
+    --pale:#dfeadf;
+    --dim:#96ad9b;
+    --violet:#a274e0;
+    --violet-deep:#6f45ad;
+    --leaf:#68a95a;
+    --wheat:#e8dcae;
+    --soil:#6d4c33;
+    --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--night);
+    color:var(--pale);
+    font-family:var(--serif);
+    font-size:15px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  button{font-family:inherit;color:inherit;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  button:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+
+  #app{
+    display:grid;
+    grid-template-columns:clamp(264px,25vw,344px) 1fr;
+    height:100%;
+  }
+
+  /* ---------- left: the two beds ---------- */
+  #beds{
+    display:flex;
+    flex-direction:column;
+    background:var(--bed);
+    border-right:1px solid var(--edge-soft);
+    min-height:0;
+  }
+  .bed{
+    flex:1 1 0;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    padding:10px 14px 12px;
+    overflow:auto;
+  }
+  .bed-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:6px;
+  }
+  .bed-head h2{
+    font-size:16px;
+    font-weight:600;
+    margin:0;
+    letter-spacing:.01em;
+  }
+  .bed-head .pheno{
+    font-size:12.5px;
+    color:var(--dim);
+    text-align:right;
+    font-style:italic;
+  }
+  .plant-frame{
+    flex:1 1 150px;
+    min-height:94px;
+    border:1px solid var(--edge-soft);
+    border-radius:3px;
+    background:#101b15;
+    overflow:hidden;
+  }
+  .plant-frame canvas{display:block;width:100%;height:100%}
+
+  .src{margin-top:9px}
+  .src .seg{width:100%}
+  .src .seg button{flex:1;font-family:var(--serif);font-size:11.5px;padding:3px 4px}
+  .seg button[disabled]{opacity:.35;cursor:default}
+  .seg button[disabled]:hover{background:transparent;color:var(--dim)}
+  .traits{margin-top:9px;display:flex;flex-direction:column;gap:5px}
+  .trait{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px}
+  .trait .seg{width:100%}
+  .seg button{flex:1}
+  .trait-name{font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .trait-name b{color:var(--pale);font-weight:500}
+  .abbr{display:none}
+  .seg{display:flex;border:1px solid var(--edge-soft);border-radius:3px;overflow:hidden}
+  .seg button{
+    background:transparent;border:0;
+    font-family:var(--mono);
+    font-size:12px;
+    padding:4px 9px;
+    color:var(--dim);
+    border-right:1px solid var(--edge-soft);
+    transition:background .12s,color .12s;
+  }
+  .seg button:last-child{border-right:0}
+  .seg button:hover{background:var(--bed-2);color:var(--pale)}
+  .seg button[aria-pressed="true"]{background:var(--violet-deep);color:#fff}
+
+  /* ---------- the cross bar ---------- */
+  #crossbar{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 14px;
+    background:var(--bed-2);
+    border-top:1px solid var(--edge-soft);
+    border-bottom:1px solid var(--edge-soft);
+  }
+  #crossbar .glyph{
+    font-size:19px;color:var(--dim);font-family:var(--mono);
+  }
+  #reproduce{
+    flex:1;
+    background:var(--violet-deep);
+    border:1px solid var(--violet);
+    border-radius:3px;
+    color:#fff;
+    font-size:15px;
+    letter-spacing:.02em;
+    padding:9px 12px;
+    transition:background .14s,transform .08s;
+  }
+  #reproduce:hover{background:#7d50c0}
+  #reproduce:active{transform:translateY(1px)}
+  #reproduce[disabled]{opacity:.45;cursor:default;transform:none}
+
+  /* ---------- right: the field ---------- */
+  #stage{position:relative;min-width:0;display:flex;flex-direction:column}
+  #tools{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 14px;
+    border-bottom:1px solid var(--edge-soft);
+    background:var(--bed);
+    flex-wrap:wrap;
+  }
+  #tools h1{
+    font-size:15px;font-weight:600;margin:0 auto 0 0;letter-spacing:.01em;
+  }
+  #tools h1 span{color:var(--dim);font-weight:400;font-style:italic}
+  .tool{
+    background:transparent;
+    border:1px solid var(--edge-soft);
+    border-radius:3px;
+    font-size:12.5px;
+    padding:4px 10px;
+    color:var(--dim);
+    transition:border-color .12s,color .12s;
+  }
+  .tool:hover{border-color:var(--edge);color:var(--pale)}
+  #field-wrap{position:relative;flex:1;min-height:0}
+  #field{display:block;width:100%;height:100%}
+
+  #readout{
+    position:absolute;top:12px;right:12px;width:262px;
+    background:rgba(16,27,21,.93);
+    border:1px solid var(--edge-soft);
+    border-radius:3px;
+    padding:10px 12px 11px;
+    backdrop-filter:blur(3px);
+  }
+  #readout h3{margin:0 0 2px;font-size:14px;font-weight:600}
+  #readout .sub{font-size:12px;color:var(--dim);font-style:italic;margin-bottom:8px}
+  .res{display:grid;grid-template-columns:auto 1fr;gap:3px 9px;align-items:baseline;font-size:12.5px}
+  .res .g{font-family:var(--mono);font-size:12.5px;color:var(--wheat)}
+  .res .p{color:var(--pale)}
+  .res .p em{color:var(--dim);font-size:11.5px;font-style:normal}
+  .empty{font-size:12.5px;color:var(--dim);line-height:1.5}
+
+  .lot{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:400;letter-spacing:0}
+  #answerkey{
+    display:none;
+    position:absolute;right:12px;bottom:12px;width:238px;
+    background:rgba(40,28,16,.94);
+    border:1px solid #6b5426;
+    border-radius:3px;padding:9px 12px 10px;
+  }
+  #answerkey h3{margin:0 0 6px;font-size:13px;font-weight:600;color:#f0dfa8}
+  #answerkey h3 span{float:right;font-family:var(--mono);font-size:10.5px;color:#a8925f;font-weight:400}
+  #ledger{
+    position:absolute;left:12px;bottom:12px;
+    background:rgba(16,27,21,.93);
+    border:1px solid var(--edge-soft);
+    border-radius:3px;
+    padding:9px 12px 10px;
+    min-width:212px;
+  }
+  #ledger h3{margin:0 0 6px;font-size:13px;font-weight:600}
+  #ledger h3 span{color:var(--dim);font-weight:400}
+  .row{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:12px;margin-bottom:5px}
+  .bar{height:5px;border-radius:3px;background:var(--edge-soft);overflow:hidden;margin-top:2px}
+  .bar i{display:block;height:100%;background:var(--violet);transition:width .3s}
+  .row .lbl{color:var(--dim)}
+  .row .lbl b{color:var(--pale);font-weight:500}
+  .row .num{font-family:var(--mono);font-size:11.5px;color:var(--wheat)}
+
+  /* Chromebook tier — 1366x768 leaves roughly 620px of viewport */
+  @media (max-height:780px), (max-width:1180px){
+    body{font-size:14px}
+    .full{display:none}
+    .abbr{display:inline}
+    .bed{padding:7px 10px 8px}
+    .bed-head{margin-bottom:4px}
+    .bed-head h2{font-size:13.5px}
+    .bed-head .pheno{font-size:10.5px;line-height:1.3}
+    .lot{font-size:10px}
+    .plant-frame{flex:1 1 96px;min-height:60px}
+    .src{margin-top:6px}
+    .src .seg button{font-size:10.5px;padding:4px 2px}
+    .traits{margin-top:6px;gap:3px}
+    .trait{gap:6px}
+    .trait-name{font-size:11.5px}
+    .seg button{font-size:11.5px;padding:4px 6px}
+    #crossbar{padding:6px 10px;gap:8px}
+    #crossbar .glyph{font-size:16px}
+    #reproduce{font-size:14px;padding:7px 10px}
+    #tools{padding:5px 10px;gap:6px}
+    #tools h1{font-size:13px}
+    #tools h1 span{display:none}
+    .tool{font-size:11.5px;padding:4px 8px}
+    #readout{width:214px;top:8px;right:8px;padding:8px 10px 9px}
+    #readout h3{font-size:13px}
+    #readout .sub{font-size:11px;margin-bottom:6px}
+    .res{font-size:11.5px;gap:2px 7px}
+    .res .g,.res .p em{font-size:11px}
+    .empty{font-size:11.5px}
+    #ledger{left:8px;bottom:8px;min-width:180px;padding:7px 10px 8px}
+    #ledger h3{font-size:12px;margin-bottom:5px}
+    .row{font-size:11px;margin-bottom:4px}
+    .bar{height:4px}
+    #answerkey{right:8px;bottom:8px;width:200px;padding:8px 10px}
+  }
+  /* smallest Chromebooks and heavy browser chrome */
+  @media (max-height:640px){
+    .plant-frame{flex:1 1 68px;min-height:46px}
+    .bed{padding:6px 9px 7px}
+    .traits{gap:2px}
+    .seg button{padding:3px 6px}
+    #reproduce{padding:6px 10px}
+  }
+  @media (max-width:820px){
+    body{overflow:auto}
+    #app{grid-template-columns:1fr;height:auto}
+    #beds{border-right:0;border-bottom:1px solid var(--edge-soft)}
+    .bed{flex:none}
+    .plant-frame{flex-basis:auto;height:130px}
+    #field-wrap{height:auto}
+    #field{height:52vh}
+    #readout{position:static;width:auto;margin:12px}
+    .lot{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:400;letter-spacing:0}
+  #answerkey{
+    display:none;
+    position:absolute;right:12px;bottom:12px;width:238px;
+    background:rgba(40,28,16,.94);
+    border:1px solid #6b5426;
+    border-radius:3px;padding:9px 12px 10px;
+  }
+  #answerkey h3{margin:0 0 6px;font-size:13px;font-weight:600;color:#f0dfa8}
+  #answerkey h3 span{float:right;font-family:var(--mono);font-size:10.5px;color:#a8925f;font-weight:400}
+  #ledger{position:static;margin:0 12px 12px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    #reproduce,.tool,.seg button{transition:none}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <aside id="beds">
+    <section class="bed" id="bed1">
+      <div class="bed-head">
+        <h2>Parent above <span class="lot" id="lot1"></span></h2>
+        <div class="pheno" id="pheno1"></div>
+      </div>
+      <div class="plant-frame"><canvas id="cv1"></canvas></div>
+      <div class="src" id="src1"></div>
+      <div class="traits" id="traits1"></div>
+    </section>
+
+    <div id="crossbar">
+      <span class="glyph">&times;</span>
+      <button id="reproduce">Reproduce</button>
+    </div>
+
+    <section class="bed" id="bed2">
+      <div class="bed-head">
+        <h2>Parent below <span class="lot" id="lot2"></span></h2>
+        <div class="pheno" id="pheno2"></div>
+      </div>
+      <div class="plant-frame"><canvas id="cv2"></canvas></div>
+      <div class="src" id="src2"></div>
+      <div class="traits" id="traits2"></div>
+    </section>
+  </aside>
+
+  <main id="stage">
+    <div id="tools">
+      <h1>Mendel's Garden <span>— one seed at a time</span></h1>
+      <button class="tool" id="draw" title="Fresh plants from the seed stock — same looks, different makeup">Draw new plants</button>
+      <button class="tool" id="skip">Finish growing</button>
+      <button class="tool" id="fast">Cross 50 more</button>
+      <button class="tool" id="reset">Clear the count</button>
+    </div>
+    <div id="field-wrap">
+      <canvas id="field"></canvas>
+      <div id="readout"></div>
+      <div id="ledger"></div>
+      <div id="answerkey"></div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   GENETICS
+   Four of Mendel's seven characters. Alleles: 1 = dominant, 0 = recessive.
+   ============================================================ */
+var TRAITS = [
+  {key:'shape', L:'R', name:'Seed shape',     dom:'Round',  rec:'Wrinkled', abbr:'Seed'},
+  {key:'stem',  L:'T', name:'Stem length',    dom:'Tall',   rec:'Short',    abbr:'Stem'},
+  {key:'color', L:'V', name:'Flower color',   dom:'Violet', rec:'White',    abbr:'Color'},
+  {key:'pos',   L:'A', name:'Flower position',dom:'Axial',  rec:'Terminal',
+   domLabel:'Along stem', recLabel:'At top', abbr:'Position'}
+];
+function label(tr, dominant){
+  return dominant ? (tr.domLabel || tr.dom) : (tr.recLabel || tr.rec);
+}
+var POS_NOTE = {Axial:'along the stem', Terminal:'at the top'};
+
+function geno(tr, a){                    // [1,1] -> "RR"
+  var s = a.slice().sort(function(x,y){return y-x;});
+  return s.map(function(v){return v ? tr.L : tr.L.toLowerCase();}).join('');
+}
+function isDom(a){ return a[0]===1 || a[1]===1; }
+function phen(tr, a){ return isDom(a) ? tr.dom : tr.rec; }
+
+function crossOne(a, b){                 // one allele from each parent, at random
+  return [ a[Math.random()<0.5?0:1], b[Math.random()<0.5?0:1] ];
+}
+function crossAll(p1, p2){
+  var kid = {};
+  TRAITS.forEach(function(tr){ kid[tr.key] = crossOne(p1[tr.key], p2[tr.key]); });
+  return kid;
+}
+function expectedRatio(a, b){            // "3 : 1", "1 : 1", "all dominant"...
+  var d=0, r=0;
+  for(var i=0;i<2;i++) for(var j=0;j<2;j++){ (a[i]||b[j]) ? d++ : r++; }
+  if(r===0) return 'every seed dominant';
+  if(d===0) return 'every seed recessive';
+  var g = gcd(d,r);
+  return (d/g)+' : '+(r/g);
+}
+function gcd(a,b){ return b ? gcd(b, a%b) : a; }
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var state = {
+  p1: {shape:[1,1], stem:[1,1], color:[1,1], pos:[1,1]},
+  p2: {shape:[0,0], stem:[0,0], color:[0,0], pos:[0,0]},
+  child: null,
+  t0: 0,
+  playing: false,
+  finished: true,
+  tally: {}, total: 0,
+  rain: [],
+  bank: {p1:{}, p2:{}},     // hidden genotype for each parent's dominant traits
+  want: {p1:{}, p2:{}},     // the phenotype the student picked
+  lot:  {p1:'', p2:''},
+  src:  {p1:'true', p2:'true'},   // 'true' | 'unmarked' | 'field'
+  adopted: {p1:null, p2:null},    // a seedling transplanted into the bed
+  gen:  {p1:1, p2:1},
+  childGen: 2,
+  key: false                // teacher's answer key, off
+};
+TRAITS.forEach(function(tr){
+  state.bank.p1[tr.key] = {}; state.bank.p2[tr.key] = {};
+  state.want.p1[tr.key] = true; state.want.p2[tr.key] = false;
+});
+
+/* A plant showing a recessive trait can only be homozygous — that is the
+   student's lever, and it holds no matter where the plant came from.
+   What a dominant-looking plant carries depends on its provenance:
+     true-breeding — a stock line that has bred true for generations
+     unmarked      — stock of unrecorded history; two in three carry a
+                     hidden allele, matching an F2 population
+     field         — a seedling transplanted in, carrying whatever it
+                     inherited. This is where heterozygotes really come
+                     from: cross two true-breeding lines and every
+                     offspring is a carrier, though nothing on the plant
+                     says so. */
+function hiddenAlleles(which, key, wantDom){
+  if(!wantDom) return [0,0];
+  if(state.src[which] === 'true') return [1,1];
+  var b = state.bank[which][key];
+  if(!b.dom) b.dom = (Math.random() < 1/3) ? [1,1] : [1,0];
+  return b.dom.slice();
+}
+function syncParent(which){
+  var p = state[which];
+  if(state.src[which] === 'field' && state.adopted[which]){
+    TRAITS.forEach(function(tr){ p[tr.key] = state.adopted[which][tr.key].slice(); });
+    return;
+  }
+  TRAITS.forEach(function(tr){
+    p[tr.key] = hiddenAlleles(which, tr.key, state.want[which][tr.key]);
+  });
+}
+function lotLabel(which){
+  return state.gen[which] === 1
+    ? 'lot ' + state.lot[which]
+    : 'F' + (state.gen[which]-1) + ' plant';
+}
+/* Counts gathered from one pair of parents say nothing about a different
+   pair, so changing a parent retires the evidence. Transplanting is the
+   exception: it clears the counts but leaves the seedling standing, so the
+   same plant can be moved into both beds and selfed. */
+function clearCounts(){
+  TRAITS.forEach(function(tr){ state.tally[tr.key] = {dom:0, rec:0}; });
+  state.total = 0;
+  state.rain = [];
+  clearLayer();
+}
+function invalidateEvidence(){
+  clearCounts();
+  state.child = null;
+  state.playing = false;
+  state.finished = true;
+}
+
+function newLot(){
+  ['p1','p2'].forEach(function(which){
+    TRAITS.forEach(function(tr){ state.bank[which][tr.key] = {}; });
+    state.lot[which] = String.fromCharCode(65 + Math.floor(Math.random()*26)) +
+                       (10 + Math.floor(Math.random()*89));
+    if(state.src[which] === 'field'){ state.src[which] = 'unmarked'; state.adopted[which] = null; }
+    state.gen[which] = 1;
+    syncParent(which);
+  });
+}
+var RAIN_CAP = 100;
+TRAITS.forEach(function(tr){ state.tally[tr.key] = {dom:0, rec:0}; });
+
+var DUR = 7800;
+/* the bed, as fractions of canvas height: sky meets soil at HORIZON,
+   crop rows run from ROW_BACK to ROW_FRONT, the hero plant sits at FRONT */
+var HORIZON = 0.46, ROW_BACK = 0.55, ROW_FRONT = 0.86, FRONT = 0.94, ROWS = 5;
+function rowFy(depth){ return ROW_BACK + (ROW_FRONT - ROW_BACK)*depth; }
+function smallScreen(){
+  return (window.innerWidth||1366) < 1180 || (window.innerHeight||768) < 780;
+}
+function clamp01(v){ return v<0?0:v>1?1:v; }
+function easeOut(t){ return 1-Math.pow(1-t,3); }
+function easeInOut(t){ return t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
+
+function phases(ms){
+  return {
+    drop : clamp01(ms/950),
+    bury : clamp01((ms-950)/650),
+    root : clamp01((ms-1450)/1100),
+    grow : clamp01((ms-2050)/3050),
+    bloom: clamp01((ms-4700)/1300),
+    pod  : clamp01((ms-6100)/1700)
+  };
+}
+var FULL = {drop:1, bury:1, root:1, grow:1, bloom:1, pod:1};
+
+/* ============================================================
+   DRAWING
+   ============================================================ */
+function rng(seed){                       // tiny deterministic PRNG for decor
+  var s = seed;
+  return function(){ s = (s*1664525 + 1013904223) % 4294967296; return s/4294967296; };
+}
+var speckles = (function(){
+  var r = rng(7), out = [];
+  for(var i=0;i<260;i++) out.push({x:r(), y:r(), s:r()*1.7+.4, a:r()*.22+.05});
+  return out;
+})();
+
+function sizeCanvas(cv){
+  var r = cv.getBoundingClientRect();
+  var dpr = Math.min(smallScreen() ? 1.5 : 2, window.devicePixelRatio || 1);
+  var w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+  if(cv.width !== w*dpr || cv.height !== h*dpr){ cv.width = w*dpr; cv.height = h*dpr; }
+  var ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx:ctx, w:w, h:h};
+}
+
+function drawSky(ctx,w,soilY){
+  var g = ctx.createLinearGradient(0,0,0,soilY);
+  g.addColorStop(0,'#101c16'); g.addColorStop(.55,'#16281f'); g.addColorStop(1,'#1d3527');
+  ctx.fillStyle = g; ctx.fillRect(0,0,w,soilY);
+  // low glow behind the plant, like a grow lamp
+  var gl = ctx.createRadialGradient(w/2, soilY, 10, w/2, soilY, Math.max(w,soilY)*.75);
+  gl.addColorStop(0,'rgba(140,200,150,.13)'); gl.addColorStop(1,'rgba(140,200,150,0)');
+  ctx.fillStyle = gl; ctx.fillRect(0,0,w,soilY);
+}
+function drawSoil(ctx,w,h,soilY){
+  var g = ctx.createLinearGradient(0,soilY,0,h);
+  g.addColorStop(0,'#5b3f2b'); g.addColorStop(1,'#33241a');
+  ctx.fillStyle = g; ctx.fillRect(0,soilY,w,h-soilY);
+  ctx.fillStyle = '#75543a';
+  ctx.fillRect(0,soilY,w,1.5);
+  var band = h - soilY;
+  for(var i=0;i<speckles.length;i++){
+    var s = speckles[i];
+    ctx.globalAlpha = s.a;
+    ctx.fillStyle = i%3 ? '#8a6444' : '#2a1d14';
+    ctx.fillRect(s.x*w, soilY + s.y*band, s.s, s.s);
+  }
+  ctx.globalAlpha = 1;
+  if(h - soilY > h*0.28){                     // a worked field recedes toward the horizon
+    ctx.save();
+    var haze = ctx.createLinearGradient(0,soilY,0,soilY+(h-soilY)*.35);
+    haze.addColorStop(0,'rgba(150,175,150,.14)'); haze.addColorStop(1,'rgba(150,175,150,0)');
+    ctx.fillStyle = haze; ctx.fillRect(0,soilY,w,(h-soilY)*.35);
+    ctx.strokeStyle = 'rgba(30,20,13,.30)'; ctx.lineWidth = 1;
+    for(var f=1;f<=7;f++){
+      var d = Math.pow(f/7, 1.7);
+      var y = soilY + (h-soilY)*d;
+      ctx.globalAlpha = .25 + .45*d;
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.bezierCurveTo(w*.3,y-2*d,w*.7,y+2*d,w,y); ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+function drawSeed(ctx,x,y,r,round,fill,stroke){
+  ctx.save(); ctx.translate(x,y);
+  ctx.beginPath();
+  if(round){
+    ctx.arc(0,0,r,0,Math.PI*2);
+  }else{
+    for(var a=0;a<=Math.PI*2+.001;a+=Math.PI/24){
+      var rr = r*(1 + .17*Math.sin(a*5) + .07*Math.sin(a*9+1.1));
+      var px = Math.cos(a)*rr, py = Math.sin(a)*rr;
+      if(a===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+  }
+  ctx.fillStyle = fill; ctx.fill();
+  if(stroke){ ctx.lineWidth = Math.max(.8, r*.13); ctx.strokeStyle = stroke; ctx.stroke(); }
+  if(round){
+    ctx.globalAlpha=.35; ctx.fillStyle='#fff';
+    ctx.beginPath(); ctx.arc(-r*.3,-r*.32,r*.3,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }else{
+    ctx.strokeStyle = stroke || 'rgba(0,0,0,.3)';
+    ctx.lineWidth = Math.max(.6, r*.1); ctx.globalAlpha=.6;
+    for(var k=-1;k<=1;k++){
+      ctx.beginPath();
+      ctx.moveTo(-r*.7, k*r*.4);
+      ctx.quadraticCurveTo(0, k*r*.4 + r*.22, r*.7, k*r*.4);
+      ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  }
+  ctx.restore();
+}
+
+function drawLeaf(ctx,x,y,ang,len,g){
+  if(g<=0) return;
+  len *= g;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(ang);
+  var grd = ctx.createLinearGradient(0,0,len,0);
+  grd.addColorStop(0,'#3f7a3a'); grd.addColorStop(1,'#6fb45c');
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.quadraticCurveTo(len*.45,-len*.42,len,0);
+  ctx.quadraticCurveTo(len*.45, len*.42,0,0);
+  ctx.fillStyle = grd; ctx.fill();
+  ctx.strokeStyle = 'rgba(20,50,22,.55)'; ctx.lineWidth = .9; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(len*.9,0);
+  ctx.strokeStyle='rgba(20,60,25,.4)'; ctx.lineWidth=.8; ctx.stroke();
+  ctx.restore();
+}
+
+function drawTendril(ctx,x,y,len,g,flip){
+  if(g<=0) return;
+  ctx.save(); ctx.translate(x,y); ctx.scale(flip?-1:1,1);
+  ctx.beginPath(); ctx.moveTo(0,0);
+  var n = 26, L = len*g;
+  for(var i=1;i<=n;i++){
+    var t = i/n;
+    var a = t*Math.PI*2.6;
+    ctx.lineTo(L*t*.62 + Math.sin(a)*4*t, -L*t + Math.cos(a)*3.2*t);
+  }
+  ctx.strokeStyle = '#7cba66'; ctx.lineWidth = 1.3; ctx.lineCap='round'; ctx.stroke();
+  ctx.restore();
+}
+
+function drawFlower(ctx,x,y,s,violet,tilt,g){
+  if(g<=0) return;
+  s *= .4 + .6*g;
+  var c = violet
+    ? {base:'#8d5ec9', dark:'#5c3590', light:'#b389e8', edge:'#4a2a75'}
+    : {base:'#f2ecdd', dark:'#c6b99c', light:'#fffdf5', edge:'#9c8f74'};
+  ctx.save(); ctx.translate(x,y); ctx.rotate(tilt);
+  // calyx
+  ctx.beginPath(); ctx.moveTo(-s*.3,s*.35); ctx.lineTo(0,s*.75); ctx.lineTo(s*.3,s*.35); ctx.closePath();
+  ctx.fillStyle = '#4e8a42'; ctx.fill();
+  // wings
+  ctx.fillStyle = c.dark;
+  ctx.beginPath(); ctx.ellipse(-s*.34,s*.1,s*.45,s*.3,-.25,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( s*.34,s*.1,s*.45,s*.3, .25,0,Math.PI*2); ctx.fill();
+  // banner
+  var bg = ctx.createLinearGradient(0,-s,0,s*.4);
+  bg.addColorStop(0,c.light); bg.addColorStop(1,c.base);
+  ctx.beginPath(); ctx.ellipse(0,-s*.42,s*.78,s*.62,0,0,Math.PI*2);
+  ctx.fillStyle = bg; ctx.fill();
+  ctx.lineWidth = .9; ctx.strokeStyle = c.edge; ctx.globalAlpha=.7; ctx.stroke(); ctx.globalAlpha=1;
+  // fold in the banner
+  ctx.beginPath(); ctx.moveTo(0,-s*.95); ctx.quadraticCurveTo(0,-s*.3,0,s*.1);
+  ctx.strokeStyle = c.edge; ctx.globalAlpha=.45; ctx.lineWidth=.8; ctx.stroke(); ctx.globalAlpha=1;
+  ctx.restore();
+}
+
+function drawPod(ctx,x,y,s,round,g,tilt){
+  if(g<=0) return;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(tilt);
+  var L = s*3.0*(.35+.65*g), W = s*.62;
+  var grd = ctx.createLinearGradient(0,-W,0,W);
+  grd.addColorStop(0,'#7cba66'); grd.addColorStop(1,'#3d7534');
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.quadraticCurveTo(L*.5,-W,L,-W*.15);
+  ctx.quadraticCurveTo(L*.5, W,0,0);
+  ctx.closePath();
+  ctx.fillStyle = grd; ctx.fill();
+  ctx.strokeStyle='rgba(22,54,24,.7)'; ctx.lineWidth=1; ctx.stroke();
+  if(g>.55){                                  // peas showing through
+    ctx.globalAlpha = .45;
+    for(var i=0;i<3;i++){
+      drawSeed(ctx, L*(.26+i*.24), -W*.06, W*.42, round, '#2c5a27', null);
+    }
+    ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+}
+
+/* Draw a whole plant. cfg = {x, soilY, maxH, tall, violet, axial, round, ph, t} */
+function drawPlant(ctx, cfg){
+  var ph = cfg.ph, t = cfg.t;
+  var H = cfg.maxH * (cfg.tall ? 1 : .46);
+  var sway = cfg.maxH * (cfg.tall ? .022 : .014);
+  var stemW = cfg.maxH * .022 + 1.4;
+  var g = easeOut(ph.grow);
+  var phase = cfg.phase || 0;
+
+  function stemX(u){ return cfg.x + Math.sin(u*2.9 + t*.0009 + phase)*sway*u*u; }
+  function stemY(u){ return cfg.soilY - H*g*u; }
+
+  // roots
+  if(ph.root>0){
+    ctx.save(); ctx.globalAlpha = .5; ctx.strokeStyle='#caa77f'; ctx.lineWidth=1.1; ctx.lineCap='round';
+    for(var r=-1;r<=1;r++){
+      ctx.beginPath(); ctx.moveTo(cfg.x, cfg.soilY);
+      ctx.quadraticCurveTo(cfg.x + r*10*ph.root, cfg.soilY + 12*ph.root,
+                           cfg.x + r*18*ph.root, cfg.soilY + 26*ph.root);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  if(g<=0) return;
+
+  // stem: one tapered polygon rather than a stroke per segment
+  var N = Math.max(6, Math.min(22, Math.round(cfg.maxH/6)));
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  var u, hw;
+  for(var i=0;i<=N;i++){
+    u = i/N; hw = stemW*.5*(1-u*.45);
+    if(i===0) ctx.moveTo(stemX(u)-hw, stemY(u)); else ctx.lineTo(stemX(u)-hw, stemY(u));
+  }
+  for(var j=N;j>=0;j--){
+    u = j/N; hw = stemW*.5*(1-u*.45);
+    ctx.lineTo(stemX(u)+hw, stemY(u));
+  }
+  ctx.closePath();
+  ctx.fillStyle = '#4e8f42';
+  ctx.fill();
+  if(cfg.maxH > 70){
+    ctx.beginPath();
+    ctx.moveTo(stemX(0), stemY(0));
+    for(var k=1;k<=N;k++){ var uu=k/N; ctx.lineTo(stemX(uu)-stemW*.22, stemY(uu)); }
+    ctx.strokeStyle='rgba(180,230,160,.28)'; ctx.lineWidth=.9; ctx.stroke();
+  }
+
+  // leaves
+  var leafU = cfg.tall ? [.18,.36,.54,.72,.88] : [.28,.58,.86];
+  if(cfg.maxH < 70) leafU = leafU.filter(function(_,i){ return i%2===0; });
+  var leafLen = cfg.maxH*(cfg.tall?.17:.20);
+  leafU.forEach(function(u,idx){
+    var lg = clamp01((g - u)/.14);
+    if(lg<=0) return;
+    var x = stemX(u), y = stemY(u), side = idx%2 ? 1 : -1;
+    drawLeaf(ctx,x,y, side>0 ? -0.42 : Math.PI+0.42, leafLen, lg);
+    drawLeaf(ctx,x,y, side>0 ? -1.05 : Math.PI+1.05, leafLen*.78, lg);
+  });
+
+  // tendril at the tip
+  if(g>.9 && cfg.axial) drawTendril(ctx, stemX(1), stemY(1), cfg.maxH*.12, clamp01((g-.9)/.1), false);
+
+  // flowers and pods
+  // flower size has a floor — color and position are the traits being read
+  var fs = Math.max(4.6, cfg.maxH*(cfg.tall?.075:.085) + 2);
+  var spots = [];
+  if(cfg.axial){
+    var au = cfg.tall ? [.42,.62,.80] : [.45,.78];
+    au.forEach(function(u,idx){
+      var side = idx%2 ? 1 : -1;
+      spots.push({x:stemX(u)+side*fs*.85, y:stemY(u)-fs*.2, tilt:side*.35, side:side});
+    });
+  }else{
+    var top = {x:stemX(1), y:stemY(1)};
+    spots.push({x:top.x, y:top.y - fs*.55, tilt:0, side:1});
+    spots.push({x:top.x - fs*1.0, y:top.y - fs*.05, tilt:-.5, side:-1});
+    spots.push({x:top.x + fs*1.0, y:top.y - fs*.05, tilt:.5, side:1});
+  }
+  spots.forEach(function(s,i){
+    var wilt = clamp01((ph.pod - i*.06)/.5);
+    var bg = clamp01((ph.bloom - i*.08)/.5) * (1-wilt*.92);
+    if(bg>0) drawFlower(ctx, s.x, s.y, fs, cfg.violet, s.tilt, bg);
+    var pg = clamp01((ph.pod - i*.07)/.6);
+    if(pg>0) drawPod(ctx, s.x, s.y+fs*.2, fs*.92, cfg.round, pg, s.side>0 ? .5 : Math.PI-0.5);
+  });
+
+  // a couple of harvested seeds resting on the soil once pods are full
+  if(ph.pod>.9 && cfg.maxH>70){
+    var sr = Math.max(3, cfg.maxH*.03);
+    var fill = cfg.round ? '#dcc98c' : '#cdb679';
+    drawSeed(ctx, cfg.x - cfg.maxH*.19, cfg.soilY - sr*.55, sr, cfg.round, fill, '#8a7442');
+    drawSeed(ctx, cfg.x - cfg.maxH*.13, cfg.soilY - sr*.45, sr*.86, cfg.round, fill, '#8a7442');
+  }
+}
+
+/* ------------------------------------------------------------
+   The plot. Every seed from a batch cross falls into a crop row,
+   germinates where it lands, and grows its own genotype. Positions
+   are fractions of the canvas, so a resize doesn't disturb the field.
+   ------------------------------------------------------------ */
+function sowSeeds(kids){
+  for(var i=0;i<kids.length;i++){
+    var k = kids[i];
+    var row = i % ROWS;
+    var depth = ROWS>1 ? row/(ROWS-1) : 1;
+    var jit = (Math.random()-0.5)*0.018;
+    state.rain.push({
+      depth: depth,
+      rest: rowFy(depth) + jit,
+      fx: 0.045 + Math.random()*0.91,
+      fy: -0.05 - Math.random()*0.07,
+      vy: 0,
+      phase: Math.random()*6.283,
+      scale: 0.85 + Math.random()*0.3,
+      tall: isDom(k.stem), violet: isDom(k.color),
+      axial: isDom(k.pos),  round: isDom(k.shape),
+      delay: i*(smallScreen() ? 74 : 44) + Math.random()*36,
+      bounced: false, landed: false, age: 0
+    });
+  }
+  if(state.rain.length > RAIN_CAP) state.rain.splice(0, state.rain.length - RAIN_CAP);
+  state.rain.sort(function(a,b){ return a.depth - b.depth; });   // back rows drawn first
+}
+
+function updateRain(dt){
+  for(var i=0;i<state.rain.length;i++){
+    var s = state.rain[i];
+    if(s.delay > 0){ s.delay -= dt; continue; }
+    if(!s.landed){
+      s.vy += 0.0000022*dt;
+      s.fy += s.vy*dt;
+      if(s.fy >= s.rest){
+        s.fy = s.rest;
+        if(!s.bounced && s.vy > 0.0009){ s.bounced = true; s.vy *= -0.3; }
+        else { s.landed = true; s.vy = 0; }
+      }
+    } else if(s.age < 3600){
+      s.age += dt;
+    }
+  }
+}
+
+/* a quicker version of the hero plant's timeline */
+function fieldPhases(age){
+  return {
+    drop : 1,
+    bury : clamp01(age/350),
+    root : clamp01((age-150)/620),
+    grow : clamp01((age-400)/1750),
+    bloom: clamp01((age-1820)/820),
+    pod  : clamp01((age-2420)/1050)
+  };
+}
+
+/* Finished plants stop changing, so they get painted once into a static
+   layer and blitted. Keeps a full field cheap on school hardware. */
+var layer = document.createElement('canvas');
+var layerCtx = null, layerW = 0, layerH = 0, layerDpr = 0;
+
+function ensureLayer(w,h){
+  var dpr = Math.min(smallScreen() ? 1.5 : 2, window.devicePixelRatio || 1);
+  if(layerW === w && layerH === h && layerDpr === dpr) return false;
+  layer.width = w*dpr; layer.height = h*dpr;
+  layerW = w; layerH = h; layerDpr = dpr;
+  layerCtx = layer.getContext('2d');
+  layerCtx.setTransform(dpr,0,0,dpr,0,0);
+  for(var i=0;i<state.rain.length;i++) state.rain[i].baked = false;
+  return true;
+}
+function clearLayer(){
+  if(layerCtx) layerCtx.clearRect(0,0,layerW,layerH);
+}
+function plantCfg(s,w,h,t,heroMaxH,ph){
+  var sc = 0.38 + 0.62*s.depth;
+  return {
+    x: s.fx*w, soilY: s.rest*h, maxH: heroMaxH*0.44*sc*s.scale,
+    t: t, phase: s.phase,
+    tall: s.tall, violet: s.violet, axial: s.axial, round: s.round,
+    ph: ph
+  };
+}
+
+function drawPlot(ctx,w,h,t,heroMaxH){
+  ensureLayer(w,h);
+  var i, s;
+  // bake anything that has finished growing since the last frame
+  for(i=0;i<state.rain.length;i++){
+    s = state.rain[i];
+    if(s.baked || !s.landed || s.age < 3600) continue;
+    if(s.bakeT === undefined) s.bakeT = t;
+    layerCtx.save();
+    layerCtx.globalAlpha = 0.62 + 0.38*s.depth;
+    drawPlant(layerCtx, plantCfg(s,w,h,s.bakeT,heroMaxH,FULL));
+    layerCtx.restore();
+    s.baked = true;
+  }
+  if(layerCtx) ctx.drawImage(layer, 0, 0, w, h);
+  // and draw only the ones still on their way up
+  for(i=0;i<state.rain.length;i++){
+    s = state.rain[i];
+    if(s.delay > 0 || s.baked) continue;
+    drawPlotPlant(ctx,s,w,h,t,heroMaxH);
+  }
+}
+
+function drawPlotPlant(ctx,s,w,h,t,heroMaxH){
+  var sc = 0.38 + 0.62*s.depth;                // near rows read larger
+  ctx.save();
+  ctx.globalAlpha = 0.62 + 0.38*s.depth;       // far rows sit back in the haze
+  if(!s.landed || s.age < 260){
+    var r = Math.max(2.4, heroMaxH*0.034*sc*s.scale);
+    drawSeed(ctx, s.fx*w, s.fy*h, r, s.round, s.round ? '#dcc98c' : '#cdb679', '#8a7442');
+  }
+  if(s.landed) drawPlant(ctx, plantCfg(s,w,h,t,heroMaxH,fieldPhases(s.age)));
+  ctx.restore();
+}
+
+/* ============================================================
+   PARENT PREVIEWS
+   ============================================================ */
+var parentsDirty = true;
+function markParents(){ parentsDirty = true; }
+
+function drawParent(cv, p, t){
+  var s = sizeCanvas(cv), ctx = s.ctx, w = s.w, h = s.h;
+  ctx.clearRect(0,0,w,h);
+  var soilY = h*.88;
+  drawSky(ctx,w,soilY);
+  drawSoil(ctx,w,h,soilY);
+  drawPlant(ctx, {
+    x: w*.5, soilY: soilY, maxH: h*.72, t: t, phase: p===state.p1 ? 0 : 1.7,
+    tall: isDom(p.stem), violet: isDom(p.color), axial: isDom(p.pos), round: isDom(p.shape),
+    ph: FULL
+  });
+}
+
+/* ============================================================
+   THE FIELD
+   ============================================================ */
+var field = document.getElementById('field');
+
+function drawField(t, dt){
+  var s0 = sizeCanvas(field), ctx = s0.ctx, w = s0.w, h = s0.h;
+  ctx.clearRect(0,0,w,h);
+  var horizon = h*HORIZON, frontY = h*FRONT;
+  drawSky(ctx,w,horizon);
+  drawSoil(ctx,w,h,horizon);
+  updateRain(dt);
+
+  var heroMaxH = Math.min(h*0.52, w*0.38);
+
+  if(state.child){
+    var ms = state.playing ? (t - state.t0) : DUR;
+    if(ms >= DUR && state.playing){ state.playing = false; state.finished = true; }
+    var ph = state.finished ? FULL : phases(ms);
+    var c = state.child;
+    var cfg = {
+      x: w*.5, soilY: frontY, maxH: heroMaxH, t: t, phase: .6,
+      tall: isDom(c.stem), violet: isDom(c.color), axial: isDom(c.pos), round: isDom(c.shape),
+      ph: ph
+    };
+
+    // the hero seed falls, hops twice, then sinks under the surface.
+    // Clipping to the soil line is what makes it absorb — repainting the
+    // whole band would just erase it, since the band now starts at the horizon.
+    if(ph.bury < 1){
+      var r = Math.max(5, heroMaxH*.038);
+      var startY = -r*2, landY = frontY - r, y;
+      if(ph.drop < 1){
+        y = startY + (landY - startY)*(ph.drop*ph.drop);
+      }else{
+        var b = ph.bury, hopT = 0.55;
+        var hop  = b < hopT ? Math.abs(Math.sin(b/hopT*Math.PI*2))*(1-b/hopT)*r*1.9 : 0;
+        var sink = b < hopT ? 0 : ((b-hopT)/(1-hopT))*r*2.4;
+        y = landY - hop + sink;
+      }
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0,0,w,frontY); ctx.clip();
+      drawSeed(ctx, w*.5, y, r, cfg.round, '#e3d094', '#8a7442');
+      ctx.restore();
+      if(ph.bury > 0.5){                       // disturbed earth where it went in
+        ctx.save();
+        ctx.globalAlpha = Math.min(1,(ph.bury-0.5)/0.5)*0.85;
+        ctx.fillStyle = '#7a5738';
+        ctx.beginPath(); ctx.ellipse(w*.5, frontY, r*2.2, r*0.62, 0, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#4a3323';
+        ctx.beginPath(); ctx.ellipse(w*.5, frontY+r*.12, r*1.1, r*0.3, 0, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    drawPlot(ctx,w,h,t,heroMaxH);      // rows behind
+    drawPlant(ctx, cfg);               // hero in front
+  }else{
+    drawPlot(ctx,w,h,t,heroMaxH);
+    if(state.rain.length === 0){
+      ctx.save();
+      ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; ctx.setLineDash([4,6]);
+      ctx.beginPath();
+      ctx.moveTo(w*.5-42, frontY+8); ctx.quadraticCurveTo(w*.5, frontY+14, w*.5+42, frontY+8);
+      ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='rgba(223,234,223,.5)';
+      ctx.font = '15px Georgia, serif';
+      ctx.textAlign='center';
+      ctx.fillText('Pick traits for both parents, then press Reproduce.', w*.5, h*.26);
+      ctx.restore();
+    }
+  }
+}
+
+/* ============================================================
+   UI
+   ============================================================ */
+var SOURCES = [
+  {id:'true',     label:'True-breeding', abbr:'True-bred',
+   tip:'A stock line that has bred true for generations.'},
+  {id:'unmarked', label:'Unmarked',      abbr:'Unmarked',
+   tip:'Stock with no breeding record kept.'},
+  {id:'field',    label:'From field',    abbr:'Field',
+   tip:'Transplant the seedling growing out in the bed.'}
+];
+
+function buildSource(container, which){
+  container.innerHTML = '';
+  var seg = document.createElement('div'); seg.className = 'seg';
+  SOURCES.forEach(function(src){
+    var b = document.createElement('button');
+    b.type = 'button'; b.title = src.tip;
+    b.innerHTML = '<span class="full">' + src.label + '</span>' +
+                  '<span class="abbr">' + src.abbr + '</span>';
+    b.addEventListener('click', function(){
+      if(src.id === 'field'){
+        if(!state.child) return;
+        state.adopted[which] = {};
+        TRAITS.forEach(function(tr){ state.adopted[which][tr.key] = state.child[tr.key].slice(); });
+        state.gen[which] = state.childGen;
+        state.src[which] = 'field';
+        syncParent(which);
+        clearCounts();          // the seedling stays put so it can fill both beds
+      }else{
+        if(state.src[which] === src.id) return;
+        state.src[which] = src.id;
+        state.adopted[which] = null;
+        state.gen[which] = 1;
+        syncParent(which);
+        invalidateEvidence();
+      }
+      refresh();
+    });
+    seg.appendChild(b);
+  });
+  container.appendChild(seg);
+  container._seg = seg;
+}
+
+function refreshSource(container, which){
+  Array.prototype.forEach.call(container._seg.children, function(b, i){
+    var src = SOURCES[i];
+    b.setAttribute('aria-pressed', state.src[which] === src.id ? 'true' : 'false');
+    b.disabled = (src.id === 'field' && !state.child && state.src[which] !== 'field');
+  });
+}
+
+function buildTraits(container, which){
+  var p = state[which];
+  container.innerHTML = '';
+  TRAITS.forEach(function(tr){
+    var row = document.createElement('div'); row.className = 'trait';
+    var name = document.createElement('div'); name.className = 'trait-name';
+    name.title = tr.name;
+    name.innerHTML = '<span class="full">' + tr.name + '</span>' +
+                     '<span class="abbr">' + tr.abbr + '</span>';
+    row.appendChild(name);
+    var seg = document.createElement('div'); seg.className = 'seg';
+    [true,false].forEach(function(dominant){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = label(tr, dominant);
+      b.title = (dominant ? tr.dom : tr.rec) + ' ' + tr.name.toLowerCase();
+      b.addEventListener('click', function(){
+        if(state.want[which][tr.key] === dominant) return;
+        state.want[which][tr.key] = dominant;
+        syncParent(which);
+        invalidateEvidence();
+        refresh();
+      });
+      seg.appendChild(b);
+    });
+    row.appendChild(seg);
+    container.appendChild(row);
+    row._tr = tr; row._name = name; row._seg = seg;
+  });
+}
+
+function refreshTraits(container, which){
+  var locked = state.src[which] === 'field';
+  var p = state[which];
+  Array.prototype.forEach.call(container.children, function(row){
+    var tr = row._tr;
+    var showsDom = locked ? isDom(p[tr.key]) : state.want[which][tr.key];
+    Array.prototype.forEach.call(row._seg.children, function(b, i){
+      b.setAttribute('aria-pressed', (i === 0) === showsDom ? 'true' : 'false');
+      b.disabled = locked;
+    });
+  });
+}
+
+function describe(p){
+  return [ phen(TRAITS[1],p.stem), phen(TRAITS[2],p.color).toLowerCase() + ' flowers',
+           phen(TRAITS[3],p.pos).toLowerCase(), phen(TRAITS[0],p.shape).toLowerCase() + ' seed'
+         ].join(' · ');
+}
+
+function renderReadout(){
+  var el = document.getElementById('readout');
+  if(!state.child){
+    el.innerHTML = '<h3>No seed yet</h3><p class="empty">Each parent passes something down, ' +
+      'but what a plant carries is not written on the outside. Pick how each parent looks, ' +
+      'press Reproduce, and see what comes up.</p>';
+    return;
+  }
+  var c = state.child;
+  var html = '<h3>This seedling &middot; F' + (state.childGen-1) + '</h3><div class="sub">' +
+             lotLabel('p1') + ' &times; ' + lotLabel('p2') + '</div><div class="res">';
+  TRAITS.forEach(function(tr){
+    var ph = phen(tr, c[tr.key]);
+    var shown = label(tr, isDom(c[tr.key]));
+    var extra = POS_NOTE[ph] ? ', ' + POS_NOTE[ph] : '';
+    var novel = !isDom(c[tr.key]) && isDom(state.p1[tr.key]) && isDom(state.p2[tr.key]);
+    html += '<div class="g">' + tr.name.split(' ')[0] + '</div>' +
+            '<div class="p">' + shown + extra +
+            (novel ? '<br><em>neither parent looked like this</em>' : '') + '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+  renderKey();
+}
+
+/* Teacher's answer key — hidden from the board, toggled with Shift+K */
+function renderKey(){
+  var el = document.getElementById('answerkey');
+  if(!el) return;
+  el.style.display = state.key ? 'block' : 'none';
+  if(!state.key) return;
+  var html = '<h3>Answer key <span>Shift+K</span></h3><div class="res">';
+  TRAITS.forEach(function(tr){
+    html += '<div class="g">' + geno(tr, state.p1[tr.key]) + ' &times; ' +
+            geno(tr, state.p2[tr.key]) + '</div>' +
+            '<div class="p"><em>' + tr.name.toLowerCase() + ' &rarr; ' +
+            expectedRatio(state.p1[tr.key], state.p2[tr.key]) + '</em></div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderLedger(){
+  var el = document.getElementById('ledger');
+  if(state.total === 0){
+    el.innerHTML = '<h3>Seed count <span>— this cross</span></h3>' +
+      '<div class="row"><span class="lbl">Sow a batch and count what comes up.</span></div>';
+    return;
+  }
+  var html = '<h3>Seed count <span>— ' + state.total + ' from this cross</span></h3>';
+  TRAITS.forEach(function(tr){
+    var t = state.tally[tr.key];
+    var pct = Math.round(t.dom / state.total * 100);
+    html += '<div class="row"><span class="lbl"><b>' + t.dom + '</b> ' + tr.dom.toLowerCase() +
+            '</span><span class="num">' + t.rec + ' ' + tr.rec.toLowerCase() + '</span></div>' +
+            '<div class="bar"><i style="width:' + pct + '%"></i></div>';
+  });
+  el.innerHTML = html;
+}
+
+function countChild(c){
+  TRAITS.forEach(function(tr){
+    state.tally[tr.key][ isDom(c[tr.key]) ? 'dom' : 'rec' ]++;
+  });
+  state.total++;
+}
+
+function refresh(){
+  refreshSource(document.getElementById('src1'), 'p1');
+  refreshSource(document.getElementById('src2'), 'p2');
+  refreshTraits(document.getElementById('traits1'), 'p1');
+  refreshTraits(document.getElementById('traits2'), 'p2');
+  document.getElementById('pheno1').textContent = describe(state.p1);
+  document.getElementById('pheno2').textContent = describe(state.p2);
+  document.getElementById('lot1').textContent = lotLabel('p1');
+  document.getElementById('lot2').textContent = lotLabel('p2');
+  renderKey();
+  renderReadout();
+  renderLedger();
+  markParents();
+}
+
+/* ---------- actions ---------- */
+var btn = document.getElementById('reproduce');
+
+btn.addEventListener('click', function(){
+  state.childGen = Math.max(state.gen.p1, state.gen.p2) + 1;
+  state.child = crossAll(state.p1, state.p2);
+  countChild(state.child);
+  state.t0 = performance.now();
+  state.playing = true;
+  state.finished = false;
+  renderReadout();
+  renderLedger();
+});
+
+document.getElementById('draw').addEventListener('click', function(){
+  newLot();
+  invalidateEvidence();
+  refresh();
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'K' && e.shiftKey){ state.key = !state.key; renderKey(); }
+});
+
+document.getElementById('skip').addEventListener('click', function(){
+  if(state.child){ state.playing = false; state.finished = true; }
+});
+
+document.getElementById('fast').addEventListener('click', function(){
+  var kids = [];
+  for(var i=0;i<50;i++){
+    var kid = crossAll(state.p1, state.p2);
+    countChild(kid);
+    kids.push(kid);
+  }
+  sowSeeds(kids);
+  renderLedger();
+});
+
+document.getElementById('reset').addEventListener('click', function(){
+  TRAITS.forEach(function(tr){ state.tally[tr.key] = {dom:0, rec:0}; });
+  state.total = 0;
+  state.rain = [];
+  clearLayer();
+  renderLedger();
+});
+
+/* ---------- boot ---------- */
+newLot();
+buildSource(document.getElementById('src1'), 'p1');
+buildSource(document.getElementById('src2'), 'p2');
+buildTraits(document.getElementById('traits1'), 'p1');
+buildTraits(document.getElementById('traits2'), 'p2');
+refresh();
+
+var cv1 = document.getElementById('cv1'), cv2 = document.getElementById('cv2');
+var lastT = 0, sizeCheck = 0, seenW = 0, seenH = 0;
+function loop(t){
+  var dt = lastT ? Math.min(48, t - lastT) : 16;
+  lastT = t;
+  // the previews only change when a parent does, so they are not redrawn
+  // every frame — that is two full plants and six gradients saved per frame
+  if(++sizeCheck % 30 === 0){
+    var r = cv1.getBoundingClientRect();
+    if(Math.round(r.width) !== seenW || Math.round(r.height) !== seenH){
+      seenW = Math.round(r.width); seenH = Math.round(r.height); parentsDirty = true;
+    }
+  }
+  if(parentsDirty){
+    drawParent(cv1, state.p1, 0);
+    drawParent(cv2, state.p2, 0);
+    parentsDirty = false;
+  }
+  drawField(t, dt);
+  requestAnimationFrame(loop);
+}
+window.addEventListener('resize', markParents);
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
