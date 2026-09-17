@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mendel's Garden — Pea Plant Cross</title>
+<title>Mendel's Garden, Pea Plant Cross</title>
 <style>
   :root{
     --night:#132019;
@@ -211,7 +211,7 @@
   .row .lbl b{color:var(--pale);font-weight:500}
   .row .num{font-family:var(--mono);font-size:11.5px;color:var(--wheat)}
 
-  /* Chromebook tier — 1366x768 leaves roughly 620px of viewport */
+  /* Chromebook tier , 1366x768 leaves roughly 620px of viewport */
   @media (max-height:780px), (max-width:1180px){
     body{font-size:14px}
     .full{display:none}
@@ -287,7 +287,7 @@
   <aside id="beds">
     <section class="bed" id="bed1">
       <div class="bed-head">
-        <h2>Parent above <span class="lot" id="lot1"></span></h2>
+        <h2>Parent 1 <span class="lot" id="lot1"></span></h2>
         <div class="pheno" id="pheno1"></div>
       </div>
       <div class="plant-frame"><canvas id="cv1"></canvas></div>
@@ -302,7 +302,7 @@
 
     <section class="bed" id="bed2">
       <div class="bed-head">
-        <h2>Parent below <span class="lot" id="lot2"></span></h2>
+        <h2>Parent 2 <span class="lot" id="lot2"></span></h2>
         <div class="pheno" id="pheno2"></div>
       </div>
       <div class="plant-frame"><canvas id="cv2"></canvas></div>
@@ -313,8 +313,8 @@
 
   <main id="stage">
     <div id="tools">
-      <h1>Mendel's Garden <span>— one seed at a time</span></h1>
-      <button class="tool" id="draw" title="Fresh plants from the seed stock — same looks, different makeup">Draw new plants</button>
+      <h1>Mendel's Garden</h1>
+      <button class="tool" id="draw" title="Fresh plants from the seed stock , same looks, different makeup">Draw new plants</button>
       <button class="tool" id="skip">Finish growing</button>
       <button class="tool" id="fast">Cross 50 more</button>
       <button class="tool" id="reset">Clear the count</button>
@@ -400,13 +400,13 @@ TRAITS.forEach(function(tr){
   state.want.p1[tr.key] = true; state.want.p2[tr.key] = false;
 });
 
-/* A plant showing a recessive trait can only be homozygous — that is the
+/* A plant showing a recessive trait can only be homozygous , that is the
    student's lever, and it holds no matter where the plant came from.
    What a dominant-looking plant carries depends on its provenance:
-     true-breeding — a stock line that has bred true for generations
-     unmarked      — stock of unrecorded history; two in three carry a
+     true-breeding , a stock line that has bred true for generations
+     unmarked      , stock of unrecorded history; two in three carry a
                      hidden allele, matching an F2 population
-     field         — a seedling transplanted in, carrying whatever it
+     field         , a seedling transplanted in, carrying whatever it
                      inherited. This is where heterozygotes really come
                      from: cross two true-breeding lines and every
                      offspring is a carrier, though nothing on the plant
@@ -726,7 +726,7 @@ function drawPlant(ctx, cfg){
   if(g>.9 && cfg.axial) drawTendril(ctx, stemX(1), stemY(1), cfg.maxH*.12, clamp01((g-.9)/.1), false);
 
   // flowers and pods
-  // flower size has a floor — color and position are the traits being read
+  // flower size has a floor , color and position are the traits being read
   var fs = Math.max(4.6, cfg.maxH*(cfg.tall?.075:.085) + 2);
   var spots = [];
   if(cfg.axial){
@@ -926,7 +926,7 @@ function drawField(t, dt){
     };
 
     // the hero seed falls, hops twice, then sinks under the surface.
-    // Clipping to the soil line is what makes it absorb — repainting the
+    // Clipping to the soil line is what makes it absorb , repainting the
     // whole band would just erase it, since the band now starts at the horizon.
     if(ph.bury < 1){
       var r = Math.max(5, heroMaxH*.038);
@@ -1101,7 +1101,7 @@ function renderReadout(){
   renderKey();
 }
 
-/* Teacher's answer key — hidden from the board, toggled with Shift+K */
+/* Teacher's answer key , hidden from the board, toggled with Shift+K */
 function renderKey(){
   var el = document.getElementById('answerkey');
   if(!el) return;
@@ -1121,11 +1121,11 @@ function renderKey(){
 function renderLedger(){
   var el = document.getElementById('ledger');
   if(state.total === 0){
-    el.innerHTML = '<h3>Seed count <span>— this cross</span></h3>' +
+    el.innerHTML = '<h3>Seed count <span>, this cross</span></h3>' +
       '<div class="row"><span class="lbl">Sow a batch and count what comes up.</span></div>';
     return;
   }
-  var html = '<h3>Seed count <span>— ' + state.total + ' from this cross</span></h3>';
+  var html = '<h3>Seed count <span>, ' + state.total + ' from this cross</span></h3>';
   TRAITS.forEach(function(tr){
     var t = state.tally[tr.key];
     var pct = Math.round(t.dom / state.total * 100);
@@ -1219,7 +1219,7 @@ function loop(t){
   var dt = lastT ? Math.min(48, t - lastT) : 16;
   lastT = t;
   // the previews only change when a parent does, so they are not redrawn
-  // every frame — that is two full plants and six gradients saved per frame
+  // every frame , that is two full plants and six gradients saved per frame
   if(++sizeCheck % 30 === 0){
     var r = cv1.getBoundingClientRect();
     if(Math.round(r.width) !== seenW || Math.round(r.height) !== seenH){
